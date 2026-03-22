@@ -20,23 +20,35 @@
         { pkgs, ... }:
         {
           packages.default = pkgs.stdenv.mkDerivation {
+            name = "pico-build";
+            src = ./.;
 
-            name = "pico-project";
-
+            # 1. Add whatever packages your script needs here
             nativeBuildInputs = with pkgs; [
               cmake
               gcc-arm-embedded
               python3
-              #ninja
+              # pkgs.pico-sdk.override { withSubmodules = true; }
             ];
 
-            buildCommand = ''
-              cd build
-              cmake ../blink
+            # 2. Run your script
+            buildPhase = ''
+              # Run your custom script.
+              # (Using 'bash' ensures it runs even if it lacks a +x permission bit)
+              bash ./nix/build.sh
             '';
 
+            # 3. Copy the results to $out so Nix can save them in the `result/` folder
+            installPhase = ''
+              mkdir -p $out
+
+              # Example: If your script creates a "build" folder with .uf2 files,
+              # copy them to $out. Adjust this to match what your script actually outputs!
+              find . -name "*.uf2" -exec cp {} $out/ \;
+            '';
           };
-          devShells.default = import ./nix/shell.nix { inherit pkgs; };
+
+          #devShells.default = import ./nix/shell.nix { inherit pkgs; };
 
         };
     };
