@@ -1,0 +1,9 @@
+CompileFlags:
+  Add:
+    - --target=arm-none-eabi
+    - arm-none-eabi-gcc -print-file-name=include
+  Remove:
+    - -march=*
+    - -mcpu=*
+    - -mfpu=*
+    - -mfloat-abi=*

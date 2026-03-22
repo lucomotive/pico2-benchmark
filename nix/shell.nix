@@ -5,7 +5,6 @@ with pkgs;
 let
   buildScript = writeShellScriptBin "pico-build" (builtins.readFile ./build.sh);
   flashScript = writeShellScriptBin "pico-flash" (builtins.readFile ./flash.sh);
-
 in
 mkShell {
   name = "pico-dev-shell";
@@ -29,6 +28,7 @@ mkShell {
     # Optional: C/C++ language server for your editor
     clang-tools
   ];
+
   shellHook = ''
     export PICO_SDK_PATH="${pico-sdk}/lib/pico-sdk"
 
@@ -36,5 +36,8 @@ mkShell {
     echo "🍓 Raspberry Pi Pico SDK environment 🍓"
     echo "======================================="
     echo "PICO_SDK_PATH is set to: $PICO_SDK_PATH"
+
+    echo "Build project with 'pico-build <project>'"
+    echo "Flash project with 'sudo pico-flash <project>'"
   '';
 }
