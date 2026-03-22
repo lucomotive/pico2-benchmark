@@ -15,6 +15,6 @@ if [ ! -d "$PROJECT" ]; then
 fi
 
 echo "→ Building $PROJECT..."
-cmake -B "build/$PROJECT" -S "$PROJECT"
+cmake -B "build/$PROJECT" -S "benchmarks/$PROJECT"
 cmake --build "build/$PROJECT" -j$(nproc)
 echo "✓ Build complete!"
