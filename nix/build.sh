@@ -2,7 +2,7 @@ set -e
 
 if [ -z "$1" ]; then
     echo "Usage: pico-build <project>"
-    echo "Projects: $(ls benchmarks/)"
+    echo "Projects: $(ls projects/)"
     #echo "Projects: $(ls -d */ | tr -d '/')"
     exit 1
 fi
@@ -15,6 +15,6 @@ if [ ! -d "$PROJECT" ]; then
 fi
 
 echo "→ Building $PROJECT..."
-cmake -B "build/$PROJECT" -S "benchmarks/$PROJECT"
+cmake -B "build/$PROJECT" -S "projects/$PROJECT"
 cmake --build "build/$PROJECT" -j$(nproc)
 echo "✓ Build complete!"
