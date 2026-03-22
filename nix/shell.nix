@@ -2,13 +2,21 @@
   pkgs ? import <nixpkgs> { },
 }:
 with pkgs;
+let
+  buildScript = writeShellScriptBin "pico-build" (builtins.readFile ./build.sh);
+  flashScript = writeShellScriptBin "pico-flash" (builtins.readFile ./flash.sh);
+
+in
 mkShell {
   name = "pico-dev-shell";
 
   buildInputs = [
+    buildScript
+    flashScript
+
     # Compiler and build tools
-    #gcc-arm-embedded
-    #cmake
+    gcc-arm-embedded
+    cmake
     #ninja
     python3 # Required by the SDK for scripts like pioasm
 
