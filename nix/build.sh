@@ -2,7 +2,7 @@ set -e
 
 if [ -z "$1" ]; then
     echo "Usage: pico-build <project>"
-    echo "Projects: $(ls -d */ | tr -d '/')"
+    echo "Projects: $(ls -d benchmarks/ | tr -d '/')"
     exit 1
 fi
 
