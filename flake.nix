@@ -19,38 +19,24 @@
       perSystem =
         { pkgs, ... }:
         {
-          packages.default = {
+          packages.default = pkgs.stdenv.mkDerivation {
 
-          };
+            name = "pico-project";
 
-          devShells.default = pkgs.mkShell {
-            name = "pico-dev-shell";
-
-            buildInputs = with pkgs; [
-              # Compiler and build tools
-              gcc-arm-embedded
+            nativeBuildInputs = with pkgs; [
               cmake
+              gcc-arm-embedded
+              python3
               #ninja
-              python3 # Required by the SDK for scripts like pioasm
-
-              # Pico specific tools
-              pico-sdk
-              picotool
-
-              #minicom
-
-              # Optional: C/C++ language server for your editor
-              clang-tools
             ];
-            shellHook = ''
-              export PICO_SDK_PATH="${pkgs.pico-sdk}/lib/pico-sdk"
 
-              echo "======================================="
-              echo "🍓 Raspberry Pi Pico SDK environment 🍓"
-              echo "======================================="
-              echo "PICO_SDK_PATH is set to: $PICO_SDK_PATH"
+            buildCommand = ''
+              cd build
+              cmake ../blink
             '';
+
           };
+          devShells.default = import ./nix/shell.nix { inherit pkgs; };
 
         };
     };
