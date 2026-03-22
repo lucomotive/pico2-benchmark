@@ -1,12 +1,12 @@
 {
   pkgs ? import <nixpkgs> { },
-  project,
+  name,
+  src,
 }:
 with pkgs;
 stdenv.mkDerivation {
-  name = project;
+  inherit name src;
   system = stdenv.system;
-  src = "./" + project;
 
   nativeBuildInputs = [
     cmake
