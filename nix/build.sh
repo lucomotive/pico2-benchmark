@@ -2,14 +2,15 @@ set -e
 
 if [ -z "$1" ]; then
     echo "Usage: pico-build <project>"
-    echo "Projects: $(ls projects/)"
+    echo "Projects:"
+    echo "$(ls projects/)" | awk '{print "\t" $0}'
     #echo "Projects: $(ls -d */ | tr -d '/')"
     exit 1
 fi
 
 PROJECT=$1
 
-if [ ! -d "$PROJECT" ]; then
+if [ ! -d "projects/$PROJECT" ]; then
     echo "✗ Project '$PROJECT' not found"
     exit 1
 fi
