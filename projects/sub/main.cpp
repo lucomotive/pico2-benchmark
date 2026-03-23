@@ -60,4 +60,5 @@ int main() {
     uint64_t average_us = run_benchmark(x, y, 300);
     printf("%lu,%lu,%llu\n", x, y, average_us);
   }
+  fflush(stdout);
 }

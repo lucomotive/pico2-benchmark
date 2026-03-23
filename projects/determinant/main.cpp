@@ -19,7 +19,6 @@ uint64_t inline run_benchmark(uint32_t x, uint16_t iterations) {
 
   // allocate matrices on stack
   Eigen::Matrix<REAL, Dyn, Dyn> mat(x, x);
-  Eigen::Matrix<REAL, Dyn, Dyn> res(x, x);
 
   // write random values
   mat.setRandom();
@@ -27,7 +26,8 @@ uint64_t inline run_benchmark(uint32_t x, uint16_t iterations) {
   absolute_time_t startTime = get_absolute_time();
   // run benchmark x times
   for (uint16_t i = 0; i < iterations; i++) {
-    res = mat.determinant();
+    // volatile does not optimize
+    volatile REAL det = mat.determinant();
   }
   absolute_time_t stopTime = get_absolute_time();
   uint64_t deltaTime = absolute_time_diff_us(startTime, stopTime);
@@ -54,6 +54,7 @@ int main() {
     // generate random size
     // max at 100x100 because anything higher leads to an out of memory panic
     uint32_t x = rand_range(min_size, max_size);
+
     printf("%u,%lu,", i, x);
 
     uint64_t average_us = run_benchmark(x, 20);

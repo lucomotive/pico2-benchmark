@@ -9,6 +9,8 @@
 // Eigen
 #include <Eigen/Dense>
 
+#define Dyn Eigen::Dynamic
+
 uint32_t rand_range(uint32_t min, uint32_t max) {
   return min + (get_rand_32() % (max - min + 1));
 }
@@ -16,10 +18,10 @@ uint32_t rand_range(uint32_t min, uint32_t max) {
 uint64_t inline run_benchmark(uint32_t x, uint32_t y, uint16_t iterations) {
 
   // allocate matrices on stack
-  Eigen::MatrixXd mat1(x, y);
-  Eigen::MatrixXd mat2(x, y);
+  Eigen::Matrix<REAL, Dyn, Dyn> mat1(x, y);
+  Eigen::Matrix<REAL, Dyn, Dyn> mat2(x, y);
 
-  Eigen::MatrixXd res(x, y);
+  Eigen::Matrix<REAL, Dyn, Dyn> res(x, y);
 
   // write random values
   mat1.setRandom();
@@ -29,15 +31,9 @@ uint64_t inline run_benchmark(uint32_t x, uint32_t y, uint16_t iterations) {
   // run benchmark x times
   for (uint16_t i = 0; i < iterations; i++) {
     res = mat1 + mat2;
-    // std::cout << "Result: " << res << std::endl;
-    // asm volatile("" : "+m"(res) : : "memory");
   }
   absolute_time_t stopTime = get_absolute_time();
   uint64_t deltaTime = absolute_time_diff_us(startTime, stopTime);
-
-  // make sure loop is not optimized
-  // volatile auto sink = res(0, 0);
-  //(void)sink;
 
   return deltaTime / iterations;
 }
@@ -52,9 +48,9 @@ int main() {
   }
 
   // print with csv format
-  printf("X,Y,time_us\n");
+  printf("n,X,Y,time_us\n");
 
-  const uint32_t benchmark_count = 100;
+  const uint32_t benchmark_count = 500;
   const uint32_t min_size = 5;
   const uint32_t max_size = 100;
   for (int i = 0; i < benchmark_count; i++) {
@@ -62,8 +58,10 @@ int main() {
     // max at 100x100 because anything higher leads to an out of memory panic
     uint32_t x = rand_range(min_size, max_size);
     uint32_t y = rand_range(min_size, max_size);
+    printf("%u,%lu,%lu,", i, x, y);
 
-    uint64_t average_us = run_benchmark(x, y, 50);
-    printf("%lu,%lu,%llu\n", x, y, average_us);
+    uint64_t average_us = run_benchmark(x, y, 300);
+    printf("%llu\n", average_us);
   }
+  fflush(stdout);
 }

@@ -1,15 +1,26 @@
-
-#include "pico/stdlib.h"
-#include <Eigen/Core>
-
+// set float or double
 #define REAL float
 
-Eigen::Matrix<REAL, 10, 10> mat;
+#include "pico/stdlib.h"
+#include "pico/time.h"
+#include <iostream>
+
+
+// Eigen
+#include <Eigen/Dense>
+
+// Matrizen global im bss-Speicher
+Eigen::Matrix<REAL, 10, 10> A;
 
 int main() {
-  sleep_ms(5000); // Warten auf Serial-Verbindung
+  stdio_init_all();
+  sleep_ms(5000);
 
-  println("Initialisiere Matrizen mit Random-Werten...\n");
-  mat.setRandom();
-  std::cout << "A = " << A << std::endl;
+  printf("Initialisiere Matrizen mit Random-Werten...\n");
+
+  while (true) {
+    A.setRandom();
+    std::cout << "A = " << A << std::endl;
+    sleep_ms(2000);
+  }
 }

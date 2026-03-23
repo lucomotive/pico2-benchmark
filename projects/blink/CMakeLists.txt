@@ -5,11 +5,11 @@ set(PICO_BOARD pico2)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Auto-symlink compile_commands.json to project root
-#execute_process(
-#    COMMAND ${CMAKE_COMMAND} -E create_symlink
-#        ${CMAKE_BINARY_DIR}/compile_commands.json
-#        ${CMAKE_SOURCE_DIR}/compile_commands.json
-#)
+execute_process(
+    COMMAND ${CMAKE_COMMAND} -E create_symlink
+        ${CMAKE_BINARY_DIR}/compile_commands.json
+        ${CMAKE_SOURCE_DIR}/compile_commands.json
+)
 
 # initialize the SDK based on PICO_SDK_PATH
 # note: this must happen before project()

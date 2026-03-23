@@ -1,8 +1,18 @@
+/**
+ * Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 #include "pico/stdlib.h"
 #include <stdio.h>
 
 int main() {
-  setup_default_uart();
-  printf("Hello, world!\n");
-  return 0;
+  stdio_init_all();
+  sleep_ms(4000);
+
+  while (true) {
+    printf("Hello, world!\n");
+    sleep_ms(1000);
+  }
 }

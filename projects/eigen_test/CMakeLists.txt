@@ -4,7 +4,12 @@ cmake_minimum_required(VERSION 3.13)
 set(PICO_BOARD pico2)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
+# Auto-symlink compile_commands.json to project root
+execute_process(
+    COMMAND ${CMAKE_COMMAND} -E create_symlink
+        ${CMAKE_BINARY_DIR}/compile_commands.json
+        ${CMAKE_SOURCE_DIR}/compile_commands.json
+)
 
 # initialize the SDK based on PICO_SDK_PATH
 # note: this must happen before project()
@@ -14,32 +19,30 @@ include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 
 project(eigen_test C CXX ASM)
 
+# EIGEN FINDEN: Erlaube Suche auf dem Host-System (wichtig für Cross-Compiling)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
+find_package(Eigen3 REQUIRED NO_MODULE)
 
 # initialize the Raspberry Pi Pico SDK
 pico_sdk_init()
-
-# EIGEN FINDEN: Erlaube Suche auf dem Host-System (wichtig für Cross-Compiling)
-#set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
-#set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/eigen-3.4" ${CMAKE_PREFIX_PATH})
-#include_directories(${CMAKE_SOURCE_DIR}/eigen-3.4)
-#find_package(Eigen3 REQUIRED NO_MODULE)
 
 # rest of your project
 add_executable(eigen_test
     main.cpp
 )
 
-target_include_directories(eigen_test PRIVATE ${CMAKE_SOURCE_DIR}/eigen-3.4)
-
 
 # Add pico_stdlib library which aggregates commonly used features
-# Add pico time to measure benchmarks
-# Add Eigen3 library
 target_link_libraries(eigen_test
     pico_stdlib
     pico_time
-    #Eigen3::Eigen
+    Eigen3::Eigen
 )
+
+# Standard-Ausgabe über USB (Serial)
+pico_enable_stdio_usb(eigen_test 1)
+pico_enable_stdio_uart(eigen_test 0)
+
 
 # create map/bin/hex/uf2 file in addition to ELF.
 pico_add_extra_outputs(eigen_test)
