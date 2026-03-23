@@ -1,6 +1,6 @@
 
 #include "pico/stdlib.h"
-#include <Eigen/Dense>
+#include <Eigen/Core>
 
 #define REAL float
 

@@ -22,13 +22,15 @@ pico_sdk_init()
 #set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
 #set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/eigen-3.4" ${CMAKE_PREFIX_PATH})
 #include_directories(${CMAKE_SOURCE_DIR}/eigen-3.4)
-target_include_directories(eigen_test PRIVATE ${CMAKE_SOURCE_DIR}/eigen-3.4)
 #find_package(Eigen3 REQUIRED NO_MODULE)
 
 # rest of your project
 add_executable(eigen_test
-    main.c
+    main.cpp
 )
+
+target_include_directories(eigen_test PRIVATE ${CMAKE_SOURCE_DIR}/eigen-3.4)
+
 
 # Add pico_stdlib library which aggregates commonly used features
 # Add pico time to measure benchmarks
@@ -36,7 +38,7 @@ add_executable(eigen_test
 target_link_libraries(eigen_test
     pico_stdlib
     pico_time
-    Eigen3::Eigen
+    #Eigen3::Eigen
 )
 
 # create map/bin/hex/uf2 file in addition to ELF.
