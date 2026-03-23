@@ -19,12 +19,12 @@ project(eigen C CXX ASM)
 pico_sdk_init()
 
 # EIGEN FINDEN: Erlaube Suche auf dem Host-System (wichtig für Cross-Compiling)
-#set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
 find_package(Eigen3 REQUIRED NO_MODULE)
 
 # rest of your project
 add_executable(eigen
-    eigen.c
+    main.c
 )
 
 # Add pico_stdlib library which aggregates commonly used features
