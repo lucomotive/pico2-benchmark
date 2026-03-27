@@ -1,5 +1,10 @@
 # Benchmark eines RP PICO 2 zur Berechnung von Matrixoperationen
 
+Jedes benchmark wartet auf ein Nutzersignal. Erst dann fängt der microcontroller and zu rechnen.
+Das hat den Nutzen um den microcontroller und PC zu synchronisieren, damit die ergebnisse anständig in einer datei gespeichert werden können.
+Bsp:
+tio /dev/ttyACM0 | tee results/.../benchmark.csv
+
 
 ## Benchmarks
 - Addition / Subtraktion
@@ -16,16 +21,32 @@
 - Copy
 - LGS
 - Convolution
+- Fourier Transform
 
 - Speicherallokation
 - IO Speichern und Abrufen (mit Segmentierung)
 
+- multicore Berechnung
 
-## Vergleich
+
+### Vergleich
+Jede Matrix-Operation wird mit verschiedenen Größen getestet um einen qualifizierten Vergleich zu erhalten.
 - Geschwindigkeit
 - Stromverbrauch
 
-## Hardware
-- PICO 1 + 2
+### Hardware
+- PICO 1
+- PICO 2 (arm + risc-v)
 - x86 PC (Ryzen 5 5600h)
 - Zero 2 W (mit Alpine Linux)
+
+
+## Progrnose
+### PICO 2
+Der PICO 2 hat [520kB SRAM](https://pip-assets.raspberrypi.com/categories/1088-raspberry-pi-pico-2-w/documents/RP-008304-DS-2-pico-2-w-datasheet.pdf?disposition=inline) zur Verfügung.
+Das entspricht 130,000 floats mit 32 bit Größe.
+Eine 360x360 Matrix würde diesen Platz gänzlich ausreizen.
+
+### PICO 1
+Der PICO 1 hat ca halb so viel RAM zur Verfügung wie sein Nachfolger, der PICO 2.
+Größere Matrizen sind hier eher keine Option.
