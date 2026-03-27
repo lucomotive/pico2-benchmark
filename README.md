@@ -10,12 +10,12 @@ while (!stdio_usb_connected()) {
   sleep_ms(100);
 }
 ```
-Das hat den Nutzen um den microcontroller und PC zu synchronisieren, damit die Ergebnisse anständig in einer datei gespeichert werden können.
+Das hat den Nutzen um den Microcontroller und PC zu synchronisieren, damit die Ergebnisse anständig in einer Datei gespeichert werden können.
 Bsp:
 tio /dev/ttyACM0 | tee results/.../benchmark.csv
 
 
-## Benchmarks
+## Planned Benchmarks
 - Addition / Subtraktion
 - Multiplikation
 - Matrix-Multiplikation
@@ -46,8 +46,8 @@ Jede Matrix-Operation wird mit verschiedenen Größen getestet um einen qualifiz
 ### Hardware
 - PICO 1
 - PICO 2 (arm + risc-v)
-- x86 PC (Ryzen 5 5600h)
 - Zero 2 W (mit Alpine Linux)
+- x86 PC (Ryzen 5 5600h)
 
 
 ## Progrnose
