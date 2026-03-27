@@ -3,9 +3,9 @@
 }:
 with pkgs;
 let
-  buildScript = writeShellScriptBin "pico-build" (builtins.readFile ./build.sh);
-  flashScript = writeShellScriptBin "pico-flash" (builtins.readFile ./flash.sh);
-  observeScript = writeShellScriptBin "pico-observe" (builtins.readFile ./observe.sh);
+  buildScript = writeShellScriptBin "pico-build" (builtins.readFile ./shell/build.sh);
+  flashScript = writeShellScriptBin "pico-flash" (builtins.readFile ./shell/flash.sh);
+  observeScript = writeShellScriptBin "pico-observe" (builtins.readFile ./shell/observe.sh);
 
   my-pico-sdk = pkgs.pico-sdk.override {
     withSubmodules = true;
