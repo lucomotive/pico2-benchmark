@@ -25,6 +25,9 @@ Bsp:
 tio /dev/ttyACM0 | tee results/.../benchmark.csv
 ```
 
+### build
+In diesem Ordner werden die build outputs jedes Projektes in "projects" abgelegt um diese kollektiv in der .gitignore auszuschließen
+
 ### .nix
 Hier sind alle [nix](https://nixos.org/) bezogenen Dateien abgelegt.
 
@@ -64,7 +67,7 @@ Jede Matrix-Operation wird mit verschiedenen Größen getestet um einen qualifiz
 - x86 PC (Ryzen 5 5600h)
 
 
-## Progrnose
+## Prognose
 ### PICO 2
 Der PICO 2 hat [520kB SRAM](https://pip-assets.raspberrypi.com/categories/1088-raspberry-pi-pico-2-w/documents/RP-008304-DS-2-pico-2-w-datasheet.pdf?disposition=inline) zur Verfügung.
 Das entspricht 130,000 floats mit 32 bit Größe.
