@@ -1,4 +1,13 @@
-# Benchmark eines RP PICO 2 zur Berechnung von Matrixoperationen
+# Projekt
+In diesem Projekt wird ein RP Pico 2 für die Berechnung verschiedener Matrixoperationen getestet.
+Dazu wird die Library "Eigen" verwendet
+
+## Orderstruktur
+### projects
+In diesem Ordner sind mehrere Projekte angelegt, die jeweils den pico 2 auf verschiedene Matrixoperationen testen.
+
+### results
+Hier werden die Benchmark-Ergebnisse gespeichert.
 
 Jedes benchmark wartet auf ein Nutzersignal. Erst dann fängt der microcontroller and zu rechnen.
 ```C
@@ -12,10 +21,15 @@ while (!stdio_usb_connected()) {
 ```
 Das hat den Nutzen um den Microcontroller und PC zu synchronisieren, damit die Ergebnisse anständig in einer Datei gespeichert werden können.
 Bsp:
+```bash
 tio /dev/ttyACM0 | tee results/.../benchmark.csv
+```
+
+### .nix
+Hier sind alle [nix](https://nixos.org/) bezogenen Dateien abgelegt.
 
 
-## Planned Benchmarks
+## Geplante Benchmarks
 - Addition / Subtraktion
 - Multiplikation
 - Matrix-Multiplikation

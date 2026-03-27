@@ -40,7 +40,6 @@ uint64_t inline run_benchmark(uint32_t x, uint32_t y, uint16_t iterations) {
 
 int main() {
   stdio_init_all();
-  // sleep_ms(2000);
 
   // wait for PC to listen
   while (!stdio_usb_connected()) {
