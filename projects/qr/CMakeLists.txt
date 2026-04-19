@@ -20,7 +20,7 @@ execute_process(
 include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 
 
-project(add C CXX ASM)
+project(qr C CXX ASM)
 
 # EIGEN FINDEN: Erlaube Suche auf dem Host-System (wichtig für Cross-Compiling)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
@@ -30,12 +30,12 @@ find_package(Eigen3 REQUIRED NO_MODULE)
 pico_sdk_init()
 
 # rest of your project
-add_executable(heap
+add_executable(qr
     main.cpp
 )
 
 # Add pico_stdlib library which aggregates commonly used features
-target_link_libraries(heap
+target_link_libraries(qr
     pico_stdlib
     pico_rand
     pico_time
@@ -43,10 +43,10 @@ target_link_libraries(heap
 )
 
 # Standard-Ausgabe über USB (Serial)
-pico_enable_stdio_usb(heap 1)
-pico_enable_stdio_uart(heap 0)
+pico_enable_stdio_usb(qr 1)
+pico_enable_stdio_uart(qr 0)
 
 
 
 # create map/bin/hex/uf2 file in addition to ELF.
-pico_add_extra_outputs(heap)
+pico_add_extra_outputs(qr)
