@@ -6,6 +6,4 @@ cmake --build build -j$(nproc)
 UF2=$(ls "build/"*.uf2 2>/dev/null | head -1)
 sudo picotool load "$UF2" --force --execute
 
-
-#mkdir -p results
-cat /dev/ttyACM0
+python console.py
