@@ -3,10 +3,7 @@
 }:
 with pkgs;
 let
-  buildScript = writeShellScriptBin "pico-build" (builtins.readFile ./scripts/build.sh);
-  flashScript = writeShellScriptBin "pico-flash" (builtins.readFile ./scripts/flash.sh);
-  observeScript = writeShellScriptBin "pico-observe" (builtins.readFile ./scripts/observe.sh);
-  runScript = writeShellScriptBin "pico-run" (builtins.readFile ./scripts/run.sh);
+  runScript = writeShellScriptBin "pico-run" (builtins.readFile ./run.sh);
 
   my-pico-sdk = pkgs.pico-sdk.override {
     withSubmodules = true;
@@ -19,9 +16,6 @@ mkShell {
     nil
     nixd
 
-    #buildScript
-    #flashScript
-    #observeScript
     runScript
 
     # Compiler and build tools
