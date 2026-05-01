@@ -11,32 +11,49 @@
 #include <Eigen/Dense>
 
 #define Dyn Eigen::Dynamic
+#define GenericMatrix Eigen::Matrix<REAL, Dyn, Dyn>
 
 uint32_t rand_range(uint32_t min, uint32_t max) {
   return min + (get_rand_32() % (max - min + 1));
 }
 
-uint64_t inline run_benchmark(uint32_t x, uint32_t y, uint16_t batch_size) {
-
-  Eigen::Matrix<REAL, Dyn, Dyn> A(x, y);
+template <bool debug>
+std::tuple<uint64_t, double> inline run_benchmark(uint32_t x, uint32_t y) {
+  GenericMatrix A(x, y);
+  // random values
   A.setRandom();
-  Eigen::HouseholderQR<Eigen::Matrix<REAL, Dyn, Dyn>> qr(A);
 
-  Eigen::Matrix<REAL, Dyn, Dyn> thinQ =
-      Eigen::Matrix<REAL, Dyn, Dyn>::Identity(x, y);
+  // debug matrix M
+  if (debug)
+    std::cout << "A = " << std::endl << A << std::endl;
 
-  Eigen::Matrix<REAL, Dyn, Dyn> Q;
-  Eigen::Matrix<REAL, Dyn, Dyn> R;
-
+  // start clock
   absolute_time_t startTime = get_absolute_time();
-  for (uint16_t i = 0; i < batch_size; i++) {
-    Q.noalias() = qr.householderQ() * thinQ;
-    R.noalias() = Q.transpose() * A;
-  }
-  absolute_time_t stopTime = get_absolute_time();
-  uint64_t deltaTime = absolute_time_diff_us(startTime, stopTime);
 
-  return deltaTime / batch_size;
+  Eigen::HouseholderQR<GenericMatrix> qr(A);
+  GenericMatrix thinQ(GenericMatrix::Identity(x, y));
+
+  GenericMatrix Q(qr.householderQ() * thinQ);
+  GenericMatrix R(Q.transpose() * A);
+
+  // stop clock
+  absolute_time_t stopTime = get_absolute_time();
+
+  // reverse engineer this
+  GenericMatrix approxA(Q * R);
+  double error = (A - approxA).squaredNorm();
+
+  // debug results
+  if (debug) {
+    std::cout << "Q = " << std::endl << Q << std::endl;
+    std::cout << "R = " << std::endl << R << std::endl;
+
+    // reverse engineer this
+    std::cout << "A ≈ " << std::endl << approxA << std::endl;
+    std::cout << "Error = " << error << std::endl;
+  }
+
+  return {absolute_time_diff_us(startTime, stopTime), error};
 }
 
 int main() {
@@ -47,22 +64,32 @@ int main() {
     sleep_ms(100);
   }
 
+  std::cout << "–––––––––––––––––––––Testing algorithm––––––––––––––––––––––"
+            << std::endl;
+  run_benchmark<true>(5, 3);
+  std::cout << "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
+            << std::endl;
+
   // print with csv format
-  printf("n,X,Y,time_us\n");
+  printf("n,X,Y,time_us,error\n");
 
-  const uint32_t benchmark_count = 200;
   const uint32_t min_size = 5;
-  const uint32_t max_size = 100;
-  for (int i = 0; i < benchmark_count; i++) {
-    // generate random size
-    // max at 100x100 because anything higher leads to an out of memory panic
-    uint32_t x = rand_range(min_size, max_size);
-    uint32_t y = rand_range(min_size, x);
+  const uint32_t max_size = 125; // max is 126x125 (out of memory error)
 
-    printf("%u,%lu,%lu,", i, x, y);
+  int i = 0;
+  for (int x = min_size; x < max_size; x++) {
+    for (int y = min_size; y < max_size; y++) {
+      if (x < y) // doesnt work if x < y
+        continue;
+      // flatten dataset by cutting out huge ratios
+      // (who even needs a 100x5 matrix)
+      if ((x < 0.3 * y) || (y < 0.3 * x))
+        continue;
 
-    uint64_t average_us = run_benchmark(x, y, 30);
-    printf("%llu\n", average_us);
+      auto [time_us, error] = run_benchmark<false>(x, y);
+      printf("%u,%lu,%lu,%llu,%e\n", i, x, y, time_us, error);
+      i++;
+    }
   }
 
   fflush(stdout);

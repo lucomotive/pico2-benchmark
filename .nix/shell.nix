@@ -15,6 +15,9 @@ mkShell {
   name = "pico-dev-shell";
 
   buildInputs = [
+    nil
+    nixd
+
     buildScript
     flashScript
     observeScript
@@ -25,6 +28,7 @@ mkShell {
     #ninja
     python3 # Required by the SDK for scripts like pioasm
     eigen
+    #gbenchmark
 
     # Pico specific tools
     my-pico-sdk

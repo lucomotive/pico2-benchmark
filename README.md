@@ -31,28 +31,30 @@ In diesem Ordner werden die build outputs jedes Projektes in "projects" abgelegt
 ### .nix
 Hier sind alle [nix](https://nixos.org/) bezogenen Dateien abgelegt.
 
+## Fertige Benchmarks
+- LU Zerlegung
+- QR Zerlegung
+- Matrix multiplikation
 
 ## Geplante Benchmarks
-- Addition / Subtraktion
-- Multiplikation
 - Matrix-Multiplikation
-- Division (Elementwise und Inverse)
-
 - Inverse
+- Division (matmul mit Inverse)
+
+- Speicherallokation
+  - Stack vs Heap
+  - IO Read/Write
+  - Ram Painting
+  - Heap fragemnation (allocate and delete)
+  - Copy
+
 - Determinante
 - Transpose
-- Normieren
-- Mean/Min/Max/Sum ...
-- Reshape
-- Copy
 - LGS
 - Convolution
 - Fourier Transform
 
-- Speicherallokation
-- IO Speichern und Abrufen (mit Segmentierung)
-
-- multicore Berechnung
+- ggf multicore Berechnung
 
 
 ### Vergleich
