@@ -1,3 +1,11 @@
+# this script communicates with the pico
+# use: run --benchmark=<...> --precision=<float|double>
+#
+# also available:
+# --min-dimension -> min width/height of calculated matrices
+# --max-dimension -> max width/height of calculated matrices
+# --iterations    -> how many measurements to perform
+
 import asyncio
 import serial
 import json
