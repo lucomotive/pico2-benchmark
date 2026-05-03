@@ -25,21 +25,28 @@ project(qr C CXX ASM)
 # EIGEN FINDEN: Erlaube Suche auf dem Host-System (wichtig für Cross-Compiling)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
 find_package(Eigen3 REQUIRED NO_MODULE)
+find_package(nlohmann_json REQUIRED)
 
 # initialize the Raspberry Pi Pico SDK
 pico_sdk_init()
+
 
 # rest of your project
 add_executable(pico2-benchmark
     src/main.cpp
 )
 
+# needed for nlohmann-json package. otherwise compiler messages spam
+target_compile_options(pico2-benchmark PRIVATE -Wno-psabi)
+
+target_include_directories(pico2-benchmark PRIVATE include)
 # Add pico_stdlib library which aggregates commonly used features
 target_link_libraries(pico2-benchmark
     pico_stdlib
     pico_rand
     pico_time
     Eigen3::Eigen
+    nlohmann_json::nlohmann_json
 )
 
 # Standard-Ausgabe über USB (Serial)
