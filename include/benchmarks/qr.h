@@ -31,7 +31,7 @@ template <typename P> void QR<P>::run(bool debug) {
 #define GenericMatrix Eigen::Matrix<P, Dyn, Dyn>
 
   uint32_t x = debug ? 5 : Benchmark::random_range_32(min_dim, max_dim);
-  uint32_t y = debug ? 5 : Benchmark::random_range_32(min_dim, max_dim);
+  uint32_t y = debug ? 5 : Benchmark::random_range_32(min_dim, x);
 
   GenericMatrix A(x, y);
   // random values

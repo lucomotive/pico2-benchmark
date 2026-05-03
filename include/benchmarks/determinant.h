@@ -23,7 +23,7 @@ public:
 };
 template <typename P> void Determinant<P>::sof() {
   printf("SOF\n");
-  printf("size,result,time_us\n");
+  printf("size,time_us\n");
 }
 template <typename P> void Determinant<P>::run(bool debug) {
 #define Dyn Eigen::Dynamic
@@ -49,7 +49,7 @@ template <typename P> void Determinant<P>::run(bool debug) {
 
   uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
   if (!debug) {
-    printf("%lu, %f, %llu\n", x, res, time_us);
+    printf("%lu,%llu\n", x, time_us);
   }
 
   // debug results
