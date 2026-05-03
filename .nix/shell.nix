@@ -23,13 +23,16 @@ mkShell {
     cmake
     #ninja
     #python3 # Required by the SDK for scripts like pioasm
-    (pkgs.python3.withPackages (
+    (python3.withPackages (
       python-pkgs: with python-pkgs; [
         pyserial
+        aioserial
+        prompt-toolkit
       ]
     ))
 
     eigen
+    nlohmann_json
     #gbenchmark
 
     # Pico specific tools
