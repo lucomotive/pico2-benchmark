@@ -3,33 +3,23 @@ In diesem Projekt wird ein RP Pico 2 für die Berechnung verschiedener Matrixope
 Dazu wird die Library "Eigen" verwendet
 
 ## Orderstruktur
-### projects
-In diesem Ordner sind mehrere Projekte angelegt, die jeweils den pico 2 auf verschiedene Matrixoperationen testen.
-
 ### results
 Hier werden die Benchmark-Ergebnisse gespeichert.
 
-Jedes benchmark wartet auf ein Nutzersignal. Erst dann fängt der microcontroller and zu rechnen.
-```C
-//  this inits the serial connection
-stdio_init_all();
+Der pico 2 kommuniziert mit einem python script, dass anweisung gibt welches benchmark mit welcher präzision (float/double) durchgeführt werden soll.
 
-// this waits for the usb connection
-while (!stdio_usb_connected()) {
-  sleep_ms(100);
-}
+### src/include
+hier sind ist der code für den pico 2 und das python script abgelegt
+
+
+## Python script
+das python script kommuniziert mit dem microcontroller. in der konsole kann hier mit 
 ```
-Das hat den Nutzen um den Microcontroller und PC zu synchronisieren, damit die Ergebnisse anständig in einer Datei gespeichert werden können.
-Bsp:
-```bash
-tio /dev/ttyACM0 | tee results/.../benchmark.csv
+run --benchmark=<...> --precision=<float|double>
 ```
+ein benchmark gestartet werden.
+Das script erstell automatisch eine datei und legt die ergebnisse ab
 
-### build
-In diesem Ordner werden die build outputs jedes Projektes in "projects" abgelegt um diese kollektiv in der .gitignore auszuschließen
-
-### .nix
-Hier sind alle [nix](https://nixos.org/) bezogenen Dateien abgelegt.
 
 ## Fertige Benchmarks
 - LU Zerlegung
