@@ -35,21 +35,20 @@ Hier sind alle [nix](https://nixos.org/) bezogenen Dateien abgelegt.
 - LU Zerlegung
 - QR Zerlegung
 - Matrix multiplikation
+- inverse
+- Determinante
+- Copy
+- Stack vs Heap
+- Heap fragemnation (allocate and delete)
 
 ## Geplante Benchmarks
-- Matrix-Multiplikation
-- Inverse
-- Division (matmul mit Inverse)
+- Division (matmul mit Inverse) (überflüssig)
 
 - Speicherallokation
-  - Stack vs Heap
   - IO Read/Write
   - Ram Painting
-  - Heap fragemnation (allocate and delete)
-  - Copy
 
-- Determinante
-- Transpose
+- Transpose (überflüssig, kopie mit extra steps)
 - LGS
 - Convolution
 - Fourier Transform
