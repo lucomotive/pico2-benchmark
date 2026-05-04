@@ -8,9 +8,11 @@ Hier werden die Benchmark-Ergebnisse gespeichert.
 
 Der pico 2 kommuniziert mit einem python script, dass anweisung gibt welches benchmark mit welcher präzision (float/double) durchgeführt werden soll.
 
-### src/include
+### src + include
 hier sind ist der code für den pico 2 und das python script abgelegt
 
+### console
+hier ist ein python script um den pico 2 zu steuern
 
 ## Python script
 das python script kommuniziert mit dem microcontroller. in der konsole kann hier mit 
