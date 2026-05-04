@@ -68,6 +68,11 @@ int main() {
     char command[128];
     gets(command);
 
+    if (strlen(command) == 0) {
+      sleep_ms(100);
+      continue;
+    }
+
     // parse to json
     // expects:
     // {

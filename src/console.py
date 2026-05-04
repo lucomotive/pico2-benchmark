@@ -66,7 +66,6 @@ async def main():
         history=FileHistory('.console_history'),
     )
 
-
     # patch_stdout stops incoming pico lines from breaking the input prompt
     with patch_stdout():
         while True:

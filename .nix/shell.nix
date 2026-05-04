@@ -26,7 +26,6 @@ mkShell {
     (python3.withPackages (
       python-pkgs: with python-pkgs; [
         pyserial
-        aioserial
         prompt-toolkit
       ]
     ))
