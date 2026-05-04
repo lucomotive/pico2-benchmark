@@ -2,3 +2,4 @@ build/
 .console_history
 compile_commands.json
 .cache
+.direnv
