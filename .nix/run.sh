@@ -29,4 +29,4 @@ else
 fi
 
 # start python console
-python src/console.py
+python console/main.py
