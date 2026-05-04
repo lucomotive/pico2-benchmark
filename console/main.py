@@ -22,35 +22,37 @@ ser = serial.Serial('/dev/ttyACM0', baudrate=115200, timeout=1)
 
 
 def receive_results(name, precision):
-    with open(f"results/{name}-{precision}-test-algorihtm.csv", "w") as f:
-        while True:
-            line = ser.readline().decode().strip()
-            if line == "SOF":
+    #with open(f"results/{name}-{precision}-test-algorihtm.csv", "w") as f:
+    while True:
+        line = ser.readline().decode().strip()
+        match line.split(" "):
+            case ["SOF", *args]:
                 print("Starting writing results to file...")
                 break
-            if line.startswith("ERROR"):
+            case ["ERROR", *args]:
                 print(line)
                 return
-            # dont print if empty or just \n
-            if line:
+            case anything if anything:
                 print(line)
-                f.write(line + "\n")
+                #f.write(line + "\n")
 
     with open(f"results/{name}-{precision}.csv", "w") as f:
         # begin writing
         while True:
             line = ser.readline().decode().strip()
-            if line == "EOF":
-                print("Benchmark finished")
-                break
-            if line == "Out of memory":
-                print(line)
-                print("Please reboot pico 2")
-                break
-            #print(line, file=f)
-            if line:
-                f.write(line + "\n")
-                f.flush()
+            match line:
+                case "EOF":
+                    print("Benchmark finished")
+                    break
+                case "Out of memory":
+                    print(line)
+                    print("Please reboot pico")
+                    break
+                case anything if anything:
+                    f.write(line + "\n")
+                    f.flush()
+
+
 
 
 
@@ -92,7 +94,7 @@ async def main():
                         defaultArgs = {
                             "precision": "float",
                             "min-dimension": 5,
-                            "max-dimension": 100,
+                            "max-dimension": 90,
                             "iterations": 1000
                         }
 

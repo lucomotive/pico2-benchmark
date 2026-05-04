@@ -20,7 +20,7 @@ execute_process(
 include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 
 
-project(pico2-benchmark C CXX ASM)
+project(pico-benchmark C CXX ASM)
 
 # EIGEN FINDEN: Erlaube Suche auf dem Host-System (wichtig für Cross-Compiling)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
@@ -32,16 +32,16 @@ pico_sdk_init()
 
 
 # rest of your project
-add_executable(pico2-benchmark
+add_executable(pico-benchmark
     src/main.cpp
 )
 
 # needed for nlohmann-json package. otherwise compiler messages spam
-target_compile_options(pico2-benchmark PRIVATE -Wno-psabi)
+target_compile_options(pico-benchmark PRIVATE -Wno-psabi)
 
-target_include_directories(pico2-benchmark PRIVATE include)
+target_include_directories(pico-benchmark PRIVATE include)
 # Add pico_stdlib library which aggregates commonly used features
-target_link_libraries(pico2-benchmark
+target_link_libraries(pico-benchmark
     pico_stdlib
     pico_rand
     pico_time
@@ -50,10 +50,10 @@ target_link_libraries(pico2-benchmark
 )
 
 # Standard-Ausgabe über USB (Serial)
-pico_enable_stdio_usb(pico2-benchmark 1)
-pico_enable_stdio_uart(pico2-benchmark 0)
+pico_enable_stdio_usb(pico-benchmark 1)
+pico_enable_stdio_uart(pico-benchmark 0)
 
 
 
 # create map/bin/hex/uf2 file in addition to ELF.
-pico_add_extra_outputs(pico2-benchmark)
+pico_add_extra_outputs(pico-benchmark)

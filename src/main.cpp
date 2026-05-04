@@ -1,58 +1,56 @@
+
+#include <benchmarks.h>
+
 #include "pico/stdlib.h"
-
-#include <Benchmark.h>
-#include <benchmarks/copy.h>
-#include <benchmarks/determinant.h>
-#include <benchmarks/fragmentation.h>
-#include <benchmarks/heap_alloc.h>
-#include <benchmarks/inverse.h>
-#include <benchmarks/lu.h>
-#include <benchmarks/matmul.h>
-#include <benchmarks/qr.h>
-#include <benchmarks/stack_alloc.h>
-
 #include <iostream>
 #include <string.h>
 
 #include <nlohmann/json.hpp>
 
-Benchmark *parse_command(const nlohmann::json &json) {
+void parse_command(const nlohmann::json &json) {
   std::string name = json["benchmark"];
   std::string precision = json["precision"];
 
   uint32_t min_dim = json["min-dimension"];
   uint32_t max_dim = json["max-dimension"];
 
-  auto benchmark = [&]<typename P>() -> Benchmark * {
-    if (name == "qr")
-      return new QR<P>(min_dim, max_dim);
-    if (name == "lu")
-      return new LU<P>(min_dim, max_dim);
-    if (name == "matmul")
-      return new MatMul<P>(min_dim, max_dim);
-    if (name == "inverse")
-      return new Inverse<P>(min_dim, max_dim);
-    if (name == "copy")
-      return new Copy<P>(min_dim, max_dim);
-    if (name == "determinant")
-      return new Determinant<P>(min_dim, max_dim);
-    if (name == "stack-alloc")
-      return new StackAlloc<P>(min_dim, max_dim);
-    if (name == "heap-alloc")
-      return new HeapAlloc<P>(min_dim, max_dim);
-    if (name == "heap-frag")
-      return new HeapFrag<P>(min_dim, max_dim);
-
-    return nullptr;
+  auto benchmark = [&]<bool Debug, typename P>() {
+    if (name == "determinant") {
+      determinant<Debug, P>(json);
+    }
+    if (name == "inverse") {
+      inverse<Debug, P>(json);
+    }
+    if (name == "lu") {
+      lu<Debug, P>(json);
+    }
+    if (name == "qr") {
+      qr<Debug, P>(json);
+    }
+    if (name == "matmul") {
+      matmul<Debug, P>(json);
+    }
+    if (name == "heap-alloc") {
+      heap_alloc<Debug, P>(json);
+    }
+    if (name == "stack-alloc") {
+      stack_alloc<Debug, P>(json);
+    }
+    if (name == "copy") {
+      copy<Debug, P>(json);
+    }
   };
 
+  printf("SOF %s %s\n", name, precision);
   if (precision == "float") {
-    return benchmark.operator()<float>();
+    benchmark.operator()<true, float>();
+    benchmark.operator()<false, float>();
   }
   if (precision == "double") {
-    return benchmark.operator()<double>();
+    benchmark.operator()<true, double>();
+    benchmark.operator()<false, double>();
   }
-  return nullptr;
+  printf("EOF\n");
 }
 
 int main() {
@@ -63,9 +61,9 @@ int main() {
     sleep_ms(100);
   }
 
+  char command[128];
   while (true) {
     // wait for command
-    char command[128];
     gets(command);
 
     if (strlen(command) == 0) {
@@ -87,22 +85,7 @@ int main() {
     // }
     auto json = nlohmann::json::parse(command);
 
-    Benchmark *benchmark = parse_command(json);
-    if (benchmark == nullptr) {
-      printf("ERROR: Invalid benchmark\n");
-      continue;
-    }
-
-    uint32_t iterations = json["iterations"];
-
-    // debug print once
-    benchmark->run(true);
-
-    benchmark->sof();
-    for (int i = 0; i < iterations; ++i) {
-      benchmark->run(false);
-    }
-    benchmark->eof();
+    parse_command(json);
 
     fflush(stdout);
   }
