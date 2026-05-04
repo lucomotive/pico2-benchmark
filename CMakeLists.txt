@@ -20,7 +20,7 @@ execute_process(
 include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 
 
-project(qr C CXX ASM)
+project(pico2-benchmark C CXX ASM)
 
 # EIGEN FINDEN: Erlaube Suche auf dem Host-System (wichtig für Cross-Compiling)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
