@@ -7,6 +7,14 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 
+#if defined(PICO_RP2350)
+const uint32_t iterations_default = 1000;
+const uint32_t min_default = 5;
+const uint32_t max_default = 100;
+#elif defined(PICO_RP2040)
+// todo
+#endif
+
 template <typename P>
 using GenericMatrix = Eigen::Matrix<P, Eigen::Dynamic, Eigen::Dynamic>;
 
@@ -15,14 +23,11 @@ static uint32_t random_range_32(uint32_t low, uint32_t high) {
 }
 
 template <bool Debug, typename P> void inverse(const nlohmann::json &json) {
-  uint32_t min = json["min-dimension"];
-  uint32_t max = json["max-dimension"];
+  uint32_t min = json.value("min-dimension", min_default);
+  uint32_t max = json.value("max-dimension", max_default);
 
-  if constexpr (!Debug) {
-    printf("size,time_us\n");
-  }
-  for (int i = min; i < max; i++) {
-    GenericMatrix<P> M(i, i);
+  auto benchmark = [&](uint32_t size) -> uint64_t {
+    GenericMatrix<P> M(size, size);
     // random values
     M.setRandom();
 
@@ -39,9 +44,6 @@ template <bool Debug, typename P> void inverse(const nlohmann::json &json) {
     (void)sink;
 
     uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
-    if constexpr (!Debug) {
-      printf("%lu,%llu\n", i, time_us);
-    }
 
     // debug results
     if constexpr (Debug) {
@@ -57,19 +59,27 @@ template <bool Debug, typename P> void inverse(const nlohmann::json &json) {
           << "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
           << std::endl;
     }
+
+    return time_us;
+  };
+  if constexpr (Debug) {
+    benchmark(min);
+    return;
+  }
+
+  printf("size,time_us\n");
+  for (int i = min; i <= max; i++) {
+    printf("%lu,%llu\n", i, benchmark(i));
   }
 }
 
 template <bool Debug, typename P> void determinant(const nlohmann::json &json) {
 
-  uint32_t min = json["min-dimension"];
-  uint32_t max = json["max-dimension"];
+  uint32_t min = json.value("min-dimension", min_default);
+  uint32_t max = json.value("max-dimension", max_default);
 
-  if constexpr (!Debug) {
-    printf("size,time_us\n");
-  }
-  for (int i = min; i < max; i++) {
-    GenericMatrix<P> A(i, i);
+  auto benchmark = [&](uint32_t size) -> uint64_t {
+    GenericMatrix<P> A(size, size);
     // random values
     A.setRandom();
 
@@ -85,9 +95,6 @@ template <bool Debug, typename P> void determinant(const nlohmann::json &json) {
     (void)res;
 
     uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
-    if constexpr (!Debug) {
-      printf("%lu,%llu\n", i, time_us);
-    }
 
     // debug results
     if constexpr (Debug) {
@@ -103,26 +110,26 @@ template <bool Debug, typename P> void determinant(const nlohmann::json &json) {
       std::cout
           << "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
           << std::endl;
-
-      break;
     }
+    return time_us;
+  };
+  if constexpr (Debug) {
+    benchmark(min);
+    return;
+  }
+
+  printf("size,time_us\n");
+  for (int i = min; i <= max; i++) {
+    printf("%lu,%llu\n", i, benchmark(i));
   }
 }
 
 template <bool Debug, typename P> void lu(const nlohmann::json &json) {
 
-  uint32_t min = json["min-dimension"];
-  uint32_t max = json["max-dimension"];
-  uint32_t iterations = json["iterations"];
+  uint32_t min = json.value("min-dimension", min_default);
+  uint32_t max = json.value("max-dimension", max_default);
 
-  if constexpr (!Debug) {
-    printf("X,Y,time_us\n");
-  }
-  for (int i = 0; i < iterations; i++) {
-
-    uint32_t x = Debug ? 5 : random_range_32(min, max);
-    uint32_t y = Debug ? 5 : random_range_32(min, x);
-
+  auto benchmark = [&](uint32_t x, uint32_t y) -> uint64_t {
     GenericMatrix<P> M(x, y);
     GenericMatrix<P> L(GenericMatrix<P>::Identity(x, x));
     // random values
@@ -146,9 +153,7 @@ template <bool Debug, typename P> void lu(const nlohmann::json &json) {
     (void)sinkL;
 
     uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
-    if (!Debug) {
-      printf("%lu,%lu,%llu\n", x, y, time_us);
-    }
+
     // debug results
     if constexpr (Debug) {
       std::cout
@@ -172,26 +177,29 @@ template <bool Debug, typename P> void lu(const nlohmann::json &json) {
       std::cout
           << "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
           << std::endl;
+    }
+    return time_us;
+  };
 
-      break;
+  if constexpr (Debug) {
+    benchmark(min, min);
+    return;
+  }
+
+  printf("X,Y,time_us\n");
+  for (int x = min; x < max; x++) {
+    for (int y = min; y < x; y++) {
+      printf("%lu,%lu,%llu\n", x, y, benchmark(x, y));
     }
   }
 }
 
 template <bool Debug, typename P> void qr(const nlohmann::json &json) {
 
-  uint32_t min = json["min-dimension"];
-  uint32_t max = json["max-dimension"];
-  uint32_t iterations = json["iterations"];
+  uint32_t min = json.value("min-dimension", min_default);
+  uint32_t max = json.value("max-dimension", max_default);
 
-  if constexpr (!Debug) {
-    printf("X,Y,time_us\n");
-  }
-  for (int i = 0; i < iterations; i++) {
-
-    uint32_t x = Debug ? 5 : random_range_32(min, max);
-    uint32_t y = Debug ? 5 : random_range_32(min, x);
-
+  auto benchmark = [&](uint32_t x, uint32_t y) -> uint64_t {
     GenericMatrix<P> A(x, y);
     // random values
     A.setRandom();
@@ -213,9 +221,7 @@ template <bool Debug, typename P> void qr(const nlohmann::json &json) {
     (void)sink;
 
     uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
-    if (!Debug) {
-      printf("%lu,%lu,%llu\n", x, y, time_us);
-    }
+
     // debug results
     if constexpr (Debug) {
       std::cout
@@ -237,27 +243,48 @@ template <bool Debug, typename P> void qr(const nlohmann::json &json) {
       std::cout
           << "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
           << std::endl;
+    }
 
-      break;
+    // if (!Debug) {
+    //   printf("%lu,%lu,%llu\n", x, y, time_us);
+    // }
+    return time_us;
+  };
+
+  if constexpr (Debug) {
+    benchmark(min, min);
+    return;
+  }
+
+  // this loop counts variables x and y like this:
+  // 1x1
+  // 2x1
+  // 1x2
+  // 2x2
+  // 3x1
+  // 3x2
+  // 3x3
+  // 1x3
+  // 2x3
+  // ...
+  //
+  // this avoids an OOM error benchmarks like 5x124
+  printf("X,Y,time_us\n");
+  for (int x = min; x <= max; x++) {
+    for (int y = min; y <= x; y++) {
+      printf("%lu,%lu,%llu\n", x, y, benchmark(x, y));
+      if (x != y)
+        printf("%lu,%lu,%llu\n", y, x, benchmark(y, x));
     }
   }
 }
 
 template <bool Debug, typename P> void matmul(const nlohmann::json &json) {
 
-  uint32_t min = json["min-dimension"];
-  uint32_t max = json["max-dimension"];
-  uint32_t iterations = json["iterations"];
+  uint32_t min = json.value("min-dimension", min_default);
+  uint32_t max = json.value("max-dimension", max_default);
 
-  if constexpr (!Debug) {
-    printf("X,Y,Z,time_us\n");
-  }
-  for (int i = 0; i < iterations; i++) {
-
-    uint32_t x = Debug ? 5 : random_range_32(min, max);
-    uint32_t y = Debug ? 5 : random_range_32(min, max);
-    uint32_t z = Debug ? 5 : random_range_32(min, max);
-
+  auto benchmark = [&](uint32_t x, uint32_t y, uint32_t z) -> uint64_t {
     // allocate matrices
     GenericMatrix<P> M1(x, y);
     GenericMatrix<P> M2(y, z);
@@ -277,9 +304,6 @@ template <bool Debug, typename P> void matmul(const nlohmann::json &json) {
     (void)sink;
 
     uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
-    if constexpr (!Debug) {
-      printf("%lu,%lu,%lu,%llu\n", x, y, z, time_us);
-    }
 
     // debug results
     if constexpr (Debug) {
@@ -296,30 +320,41 @@ template <bool Debug, typename P> void matmul(const nlohmann::json &json) {
       std::cout
           << "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
           << std::endl;
+    }
 
-      break;
+    return time_us;
+  };
+  if constexpr (Debug) {
+    benchmark(min, min, min);
+    return;
+  }
+
+  printf("X,Y,Z,time_us\n");
+  for (int x = min; x <= max; x++) {
+    for (int y = min; y <= x; y++) {
+      for (int z = min; z <= y; z++) {
+        printf("%lu,%lu,%lu,%llu\n", x, y, z, benchmark(x, y, z));
+        if (x != y)
+          printf("%lu,%lu,%lu,%llu\n", y, x, z, benchmark(y, x, z));
+        if (y != z)
+          printf("%lu,%lu,%lu,%llu\n", x, z, y, benchmark(x, z, y));
+        if (z != x)
+          printf("%lu,%lu,%lu,%llu\n", z, y, x, benchmark(z, y, x));
+      }
     }
   }
 }
 
 template <bool Debug, typename P> void heap_alloc(const nlohmann::json &json) {
 
-  uint32_t min = json["min-dimension"];
-  uint32_t max = json["max-dimension"];
-  uint32_t iterations = json["iterations"];
+  uint32_t min = json.value("min-dimension", min_default);
+  uint32_t max = json.value("max-dimension", max_default);
 
-  if constexpr (!Debug) {
-    printf("X,Y,time_us\n");
-  }
-  for (int i = 0; i < iterations; i++) {
-
-    uint32_t x = Debug ? 5 : random_range_32(min, max);
-    uint32_t y = Debug ? 5 : random_range_32(min, max);
-
+  auto benchmark = [&](uint32_t size) {
     // start clock
     absolute_time_t startTime = get_absolute_time();
     // perform calculation
-    GenericMatrix<P> A(x, y);
+    GenericMatrix<P> A(size, size);
     // stop clock
     absolute_time_t stopTime = get_absolute_time();
 
@@ -328,36 +363,28 @@ template <bool Debug, typename P> void heap_alloc(const nlohmann::json &json) {
     volatile P sink = A(0, 0);
     (void)sink;
 
-    uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
-    if constexpr (!Debug) {
-      printf("%lu,%lu,%llu\n", x, y, time_us);
-    }
+    return absolute_time_diff_us(startTime, stopTime);
+  };
+  if constexpr (Debug) {
+    benchmark(min);
+    return;
+  }
 
-    // skip debug (useless in this case)
-    if constexpr (Debug)
-      break;
+  printf("size,time_us\n");
+  for (int i = min; i < max; i++) {
+    printf("%lu,%llu\n", i, benchmark(i));
   }
 }
 
 template <bool Debug, typename P> void stack_alloc(const nlohmann::json &json) {
 
-  const int MATRIX_SIZE = 100;
+  uint32_t iterations = json.value("iterations", 200);
 
-  uint32_t min = json["min-dimension"];
-  uint32_t max = json["max-dimension"];
-
-  if constexpr (!Debug) {
-    printf("size,time_us\n");
-  }
-  for (int i = min; i < max; i++) {
-
-    // uint32_t x = Debug ? 5 : random_range_32(min, max);
-    // uint32_t y = Debug ? 5 : random_range_32(min, max);
-
+  auto benchmark = [&]() {
     // start clock
     absolute_time_t startTime = get_absolute_time();
     // perform calculation
-    Eigen::Matrix<P, MATRIX_SIZE, MATRIX_SIZE> A;
+    Eigen::Matrix<P, max_default, max_default> A;
     // stop clock
     absolute_time_t stopTime = get_absolute_time();
 
@@ -366,30 +393,24 @@ template <bool Debug, typename P> void stack_alloc(const nlohmann::json &json) {
     volatile P sink = A(0, 0);
     (void)sink;
 
-    uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
-    if constexpr (!Debug) {
-      printf("%lu,%llu\n", MATRIX_SIZE, time_us);
-    }
+    return absolute_time_diff_us(startTime, stopTime);
+  };
+  if constexpr (Debug) {
+    benchmark();
+    return;
+  }
 
-    // skip debug (useless in this case)
-    if constexpr (Debug)
-      break;
+  printf("size,time_us\n");
+  for (int i = 0; i < iterations; i++) {
+    printf("%lu,%llu\n", max_default, benchmark());
   }
 }
 
 template <bool Debug, typename P> void copy(const nlohmann::json &json) {
-  uint32_t min = json["min-dimension"];
-  uint32_t max = json["max-dimension"];
-  uint32_t iterations = json["iterations"];
+  uint32_t min = json.value("min-dimension", min_default);
+  uint32_t max = json.value("max-dimension", max_default);
 
-  if constexpr (!Debug) {
-    printf("X,Y,time_us\n");
-  }
-  for (int i = 0; i < iterations; i++) {
-
-    uint32_t x = Debug ? 5 : random_range_32(min, max);
-    uint32_t y = Debug ? 5 : random_range_32(min, max);
-
+  auto benchmark = [&](uint32_t x, uint32_t y) {
     GenericMatrix<P> A(x, y);
     // random values
     A.setRandom();
@@ -405,13 +426,19 @@ template <bool Debug, typename P> void copy(const nlohmann::json &json) {
     volatile P sink = R(0, 0);
     (void)sink;
 
-    uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
-    if constexpr (!Debug) {
-      printf("%lu,%lu,%llu\n", x, y, time_us);
-    }
+    return absolute_time_diff_us(startTime, stopTime);
+  };
+  if constexpr (Debug) {
+    benchmark(min, min);
+    return;
+  }
 
-    // skip debug (useless in this case)
-    if constexpr (Debug)
-      break;
+  printf("X,Y,time_us\n");
+  for (int x = min; x <= max; x++) {
+    for (int y = min; y <= x; y++) {
+      printf("%lu,%lu,%llu\n", x, y, benchmark(x, y));
+      if (y != x)
+        printf("%lu,%lu,%llu\n", y, x, benchmark(y, x));
+    }
   }
 }

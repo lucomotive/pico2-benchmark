@@ -2,6 +2,7 @@
 #include <benchmarks.h>
 
 #include "pico/stdlib.h"
+
 #include <iostream>
 #include <string.h>
 
@@ -9,48 +10,42 @@
 
 void parse_command(const nlohmann::json &json) {
   std::string name = json["benchmark"];
-  std::string precision = json["precision"];
-
-  uint32_t min_dim = json["min-dimension"];
-  uint32_t max_dim = json["max-dimension"];
+  std::string precision = json.value("precision", "float");
 
   auto benchmark = [&]<bool Debug, typename P>() {
-    if (name == "determinant") {
+    if (name == "determinant" || name = "det")
       determinant<Debug, P>(json);
-    }
-    if (name == "inverse") {
+    if (name == "inverse")
       inverse<Debug, P>(json);
-    }
-    if (name == "lu") {
+    if (name == "lu")
       lu<Debug, P>(json);
-    }
-    if (name == "qr") {
+    if (name == "qr")
       qr<Debug, P>(json);
-    }
-    if (name == "matmul") {
+    if (name == "matmul")
       matmul<Debug, P>(json);
-    }
-    if (name == "heap-alloc") {
+    if (name == "heap-alloc")
       heap_alloc<Debug, P>(json);
-    }
-    if (name == "stack-alloc") {
+    if (name == "stack-alloc")
       stack_alloc<Debug, P>(json);
-    }
-    if (name == "copy") {
+    if (name == "copy")
       copy<Debug, P>(json);
-    }
   };
 
-  printf("SOF %s %s\n", name, precision);
+  auto run = [&]<typename P>() {
+    printf("SOF test %s %s\n", name.c_str(), precision.c_str());
+    benchmark.operator()<true, P>();
+    printf("EOF test %s %s\n", name.c_str(), precision.c_str());
+    printf("SOF result %s %s\n", name.c_str(), precision.c_str());
+    benchmark.operator()<false, P>();
+    printf("EOF result %s %s\n", name.c_str(), precision.c_str());
+    printf("EOT\n");
+  };
   if (precision == "float") {
-    benchmark.operator()<true, float>();
-    benchmark.operator()<false, float>();
+    run.operator()<float>();
   }
   if (precision == "double") {
-    benchmark.operator()<true, double>();
-    benchmark.operator()<false, double>();
+    run.operator()<double>();
   }
-  printf("EOF\n");
 }
 
 int main() {
