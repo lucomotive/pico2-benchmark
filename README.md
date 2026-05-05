@@ -17,7 +17,7 @@ hier ist ein python script um den pico 2 zu steuern
 ## Python script
 das python script kommuniziert mit dem microcontroller. in der konsole kann hier mit 
 ```
-run --benchmark=<...> --precision=<float|double>
+python console/main.py --file=benchmarks/qr-float.json 
 ```
 ein benchmark gestartet werden.
 Das script erstell automatisch eine datei und legt die ergebnisse ab
@@ -30,8 +30,8 @@ Das script erstell automatisch eine datei und legt die ergebnisse ab
 - inverse
 - Determinante
 - Copy
-- Stack vs Heap
-- Heap fragemnation (allocate and delete)
+- Stack allocation
+- Heap allocation
 
 ## Geplante Benchmarks
 - Division (matmul mit Inverse) (überflüssig)
@@ -39,6 +39,7 @@ Das script erstell automatisch eine datei und legt die ergebnisse ab
 - Speicherallokation
   - IO Read/Write
   - Ram Painting
+  - Heap fragemnation (allocate and delete)
 
 - Transpose (überflüssig, kopie mit extra steps)
 - LGS
