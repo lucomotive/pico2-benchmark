@@ -1,10 +1,3 @@
-# this script communicates with the pico
-# use: run --benchmark=<...> --precision=<float|double>
-#
-# also available:
-# --min-dimension -> min width/height of calculated matrices
-# --max-dimension -> max width/height of calculated matrices
-# --iterations    -> how many measurements to perform
 
 import asyncio
 import serial
@@ -13,10 +6,9 @@ import sys
 import argparse
 
 
-ser = serial.Serial('/dev/ttyACM0', baudrate=115200, timeout=1)
 
 
-def receive_results():
+def receive_results(ser, args):
     file = None
 
     while True:
@@ -30,7 +22,7 @@ def receive_results():
                     print("Received start of file signal, but file already open")
                     continue
                 print("Received start of file signal. Opening file...")
-                file = open(f"results/{name.upper()}-{precision.upper()}-{type.upper()}.csv", "w")
+                file = open(f"{args.results}/{name.upper()}-{precision.upper()}-{type.upper()}.csv", "w")
             case ["EOF", *_]:
                 if not file:
                     print("Received end of file signal, but no file open")
@@ -45,6 +37,9 @@ def receive_results():
                 break
             case ["Out", "of", "memory"]:
                 print(decoded)
+                if file:
+                    file.write(decoded + "\n")
+                    file.flush()
                 print("Please reboot pico")
                 break
             case anything if anything:
@@ -63,8 +58,12 @@ def receive_results():
 def main():
     parser = argparse.ArgumentParser(prog='console')
     parser.add_argument('--file', help='file in json format specifying the benchmark parameters', type=str, required=True)
+    parser.add_argument('--device', help='device to communicate with. defaults to /dev/ttyACM0', type=str, default='/dev/ttyACM0')
+    parser.add_argument('--results', help='folder to store results in', type=str, default='results')
+
     args = parser.parse_args(sys.argv[1:])
 
+    ser = serial.Serial(args.device, baudrate=115200, timeout=1)
 
     file = open(args.file, "r")
     content = file.read()
@@ -75,7 +74,7 @@ def main():
     message = json.dumps(j)
     print(f"Sending to pico...\n{content}")
     ser.write(f"{message}\n".encode())
-    receive_results()
+    receive_results(ser, args)
 
 
 main()
