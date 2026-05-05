@@ -1,0 +1,6 @@
+{
+  "benchmark": "qr",
+  "precision": "double",
+  "min-dimension": 5,
+  "max-dimension": 500
+}

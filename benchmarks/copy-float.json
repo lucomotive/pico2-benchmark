@@ -1,0 +1,6 @@
+{
+  "benchmark": "copy",
+  "precision": "float",
+  "min-dimension": 5,
+  "max-dimension": 500
+}
