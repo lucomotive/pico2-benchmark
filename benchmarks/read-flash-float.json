@@ -1,0 +1,5 @@
+{
+  "benchmark": "read-flash",
+  "precision": "float",
+  "iterations": 100
+}

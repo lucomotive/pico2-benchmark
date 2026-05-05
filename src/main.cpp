@@ -10,7 +10,7 @@
 
 void parse_command(const nlohmann::json &json) {
   std::string name = json["benchmark"];
-  std::string precision = json.value("precision", "float");
+  std::string precision = json.value("precision", precision_default);
 
   auto benchmark = [&]<bool Debug, typename P>() {
     if (name == "determinant" || name == "det")
@@ -29,6 +29,8 @@ void parse_command(const nlohmann::json &json) {
       stack_alloc<Debug, P>(json);
     if (name == "copy")
       copy<Debug, P>(json);
+    if (name == "read-flash")
+      read_flash<Debug, P>(json);
   };
 
   auto run = [&]<typename P>() {
@@ -56,7 +58,7 @@ int main() {
     sleep_ms(100);
   }
 
-  char command[128];
+  char command[256];
   while (true) {
     // wait for command
     gets(command);

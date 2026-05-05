@@ -12,19 +12,27 @@ const uint32_t iterations_default = 1000;
 const uint32_t min_default = 5;
 const uint32_t max_default = 100;
 #elif defined(PICO_RP2040)
-// todo
+const uint32_t iterations_default = 1000;
+const uint32_t min_default = 5;
+const uint32_t max_default = 100;
 #endif
+const uint32_t step_default = 1;
+const float dim_ratio_default = 0.3;
+const float step_growth_default = 0.0;
+const char *precision_default = "float";
 
 template <typename P>
 using GenericMatrix = Eigen::Matrix<P, Eigen::Dynamic, Eigen::Dynamic>;
 
-static uint32_t random_range_32(uint32_t low, uint32_t high) {
-  return low + (get_rand_32() % (high - low + 1));
+const uint32_t random_range_32(uint32_t low, uint32_t high) {
+  return low + (get_rand_32() % (high - low));
 }
 
 template <bool Debug, typename P> void inverse(const nlohmann::json &json) {
   uint32_t min = json.value("min-dimension", min_default);
   uint32_t max = json.value("max-dimension", max_default);
+  float step = (float)json.value("step", step_default);
+  float step_growth = json.value("step-growth", step_growth_default);
 
   auto benchmark = [&](uint32_t size) -> uint64_t {
     GenericMatrix<P> M(size, size);
@@ -40,7 +48,7 @@ template <bool Debug, typename P> void inverse(const nlohmann::json &json) {
     absolute_time_t stopTime = get_absolute_time();
 
     // prevents optimization
-    volatile P sink = R(0, 0);
+    volatile P sink = R(random_range_32(0, size), random_range_32(0, size));
     (void)sink;
 
     uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
@@ -63,13 +71,16 @@ template <bool Debug, typename P> void inverse(const nlohmann::json &json) {
     return time_us;
   };
   if constexpr (Debug) {
-    benchmark(min);
+    benchmark(4);
+    benchmark(7);
+    benchmark(12);
     return;
   }
 
   printf("size,time_us\n");
-  for (int i = min; i <= max; i++) {
+  for (int i = min; i <= max; i += (int)step) {
     printf("%lu,%llu\n", i, benchmark(i));
+    step += step_growth;
   }
 }
 
@@ -77,6 +88,8 @@ template <bool Debug, typename P> void determinant(const nlohmann::json &json) {
 
   uint32_t min = json.value("min-dimension", min_default);
   uint32_t max = json.value("max-dimension", max_default);
+  float step = (float)json.value("step", step_default);
+  float step_growth = json.value("step-growth", step_growth_default);
 
   auto benchmark = [&](uint32_t size) -> uint64_t {
     GenericMatrix<P> A(size, size);
@@ -86,12 +99,14 @@ template <bool Debug, typename P> void determinant(const nlohmann::json &json) {
     // start clock
     absolute_time_t startTime = get_absolute_time();
 
-    P res = A.determinant();
+    volatile P res = A.determinant();
 
     // stop clock
     absolute_time_t stopTime = get_absolute_time();
 
     // prevent optimization (hopefully)
+    volatile P sink = A(random_range_32(0, size), random_range_32(0, size));
+    (void)sink;
     (void)res;
 
     uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
@@ -114,13 +129,16 @@ template <bool Debug, typename P> void determinant(const nlohmann::json &json) {
     return time_us;
   };
   if constexpr (Debug) {
-    benchmark(min);
+    benchmark(4);
+    benchmark(7);
+    benchmark(12);
     return;
   }
 
   printf("size,time_us\n");
-  for (int i = min; i <= max; i++) {
+  for (int i = min; i <= max; i += (int)step) {
     printf("%lu,%llu\n", i, benchmark(i));
+    step += step_growth;
   }
 }
 
@@ -128,6 +146,12 @@ template <bool Debug, typename P> void lu(const nlohmann::json &json) {
 
   uint32_t min = json.value("min-dimension", min_default);
   uint32_t max = json.value("max-dimension", max_default);
+  float step = (float)json.value("step", step_default);
+  float step_growth = json.value("step-growth", step_growth_default);
+  float sub_step = json.value("sub-step", step);
+  float sub_step_growth = json.value("sub-step-growth", step_growth);
+
+  float dim_ratio = json.value("max-dim-ratio", dim_ratio_default);
 
   auto benchmark = [&](uint32_t x, uint32_t y) -> uint64_t {
     GenericMatrix<P> M(x, y);
@@ -147,9 +171,9 @@ template <bool Debug, typename P> void lu(const nlohmann::json &json) {
     absolute_time_t stopTime = get_absolute_time();
 
     // prevent optimization (hopefully)
-    volatile P sinkU = U(0, 0);
+    volatile P sinkU = U(random_range_32(0, x), random_range_32(0, y));
     (void)sinkU;
-    volatile P sinkL = L(0, 0);
+    volatile P sinkL = L(random_range_32(0, x), random_range_32(0, x));
     (void)sinkL;
 
     uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
@@ -182,17 +206,21 @@ template <bool Debug, typename P> void lu(const nlohmann::json &json) {
   };
 
   if constexpr (Debug) {
-    benchmark(min, min);
+    benchmark(7, 4);
+    benchmark(5, 5);
+    benchmark(12, 3);
     return;
   }
 
   printf("X,Y,time_us\n");
-  for (int x = min; x < max; x++) {
-    for (int y = min; y < x; y++) {
-      if (3 * y < x /*|| 3 * x < y not possible*/)
+  for (int x = min; x < max; x += (int)step) {
+    for (int y = min; y < x; y += (int)sub_step) {
+      if (y < x * dim_ratio /*||x < y * skip not possible*/)
         continue;
       printf("%lu,%lu,%llu\n", x, y, benchmark(x, y));
     }
+    step += step_growth;
+    sub_step += sub_step_growth;
   }
 }
 
@@ -200,6 +228,12 @@ template <bool Debug, typename P> void qr(const nlohmann::json &json) {
 
   uint32_t min = json.value("min-dimension", min_default);
   uint32_t max = json.value("max-dimension", max_default);
+  float step = (float)json.value("step", step_default);
+  float step_growth = json.value("step-growth", step_growth_default);
+  float sub_step = json.value("sub-step", step);
+  float sub_step_growth = json.value("sub-step-growth", step_growth);
+
+  float dim_ratio = json.value("max-dim-ratio", dim_ratio_default);
 
   auto benchmark = [&](uint32_t x, uint32_t y) -> uint64_t {
     GenericMatrix<P> A(x, y);
@@ -219,7 +253,7 @@ template <bool Debug, typename P> void qr(const nlohmann::json &json) {
     absolute_time_t stopTime = get_absolute_time();
 
     // prevent optimization (hopefully)
-    volatile P sink = R(0, 0);
+    volatile P sink = R(random_range_32(0, y), random_range_32(0, y));
     (void)sink;
 
     uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
@@ -254,7 +288,9 @@ template <bool Debug, typename P> void qr(const nlohmann::json &json) {
   };
 
   if constexpr (Debug) {
-    benchmark(min, min);
+    benchmark(4, 7);
+    benchmark(5, 5);
+    benchmark(7, 4);
     return;
   }
 
@@ -272,14 +308,16 @@ template <bool Debug, typename P> void qr(const nlohmann::json &json) {
   //
   // this avoids an OOM error benchmarks like 5x124
   printf("X,Y,time_us\n");
-  for (int x = min; x <= max; x++) {
-    for (int y = min; y <= x; y++) {
-      if (3 * y < x /*|| 3 * x < y not possible*/)
+  for (int x = min; x <= max; x += (int)step) {
+    for (int y = min; y <= x; y += (int)sub_step) {
+      if (y < x * dim_ratio /*|| x < y * skip not possible*/)
         continue;
       printf("%lu,%lu,%llu\n", x, y, benchmark(x, y));
       if (x != y)
         printf("%lu,%lu,%llu\n", y, x, benchmark(y, x));
     }
+    step += step_growth;
+    sub_step += sub_step_growth;
   }
 }
 
@@ -287,6 +325,12 @@ template <bool Debug, typename P> void matmul(const nlohmann::json &json) {
 
   uint32_t min = json.value("min-dimension", min_default);
   uint32_t max = json.value("max-dimension", max_default);
+  float step = (float)json.value("step", step_default);
+  float step_growth = json.value("step-growth", step_growth_default);
+  float sub_step = json.value("sub-step", step);
+  float sub_step_growth = json.value("sub-step-growth", step_growth);
+
+  float dim_ratio = json.value("max-dim-ratio", dim_ratio_default);
 
   auto benchmark = [&](uint32_t x, uint32_t y, uint32_t z) -> uint64_t {
     // allocate matrices
@@ -304,7 +348,7 @@ template <bool Debug, typename P> void matmul(const nlohmann::json &json) {
     absolute_time_t stopTime = get_absolute_time();
 
     // prevent optimization (hopefully)
-    volatile P sink = R(0, 0);
+    volatile P sink = R(random_range_32(0, x), random_range_32(0, z));
     (void)sink;
 
     uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
@@ -329,14 +373,19 @@ template <bool Debug, typename P> void matmul(const nlohmann::json &json) {
     return time_us;
   };
   if constexpr (Debug) {
-    benchmark(min, min, min);
+    benchmark(5, 5, 5);
+    benchmark(7, 3, 6);
+    benchmark(13, 8, 4);
     return;
   }
 
   printf("X,Y,Z,time_us\n");
-  for (int x = min; x <= max; x++) {
-    for (int y = min; y <= x; y++) {
-      for (int z = min; z <= y; z++) {
+  for (int x = min; x <= max; x += (int)step) {
+    for (int y = min; y <= x; y += (int)sub_step) {
+      for (int z = min; z <= y; z += (int)sub_step) {
+        if (y < x * dim_ratio || z < y * dim_ratio ||
+            z < x * dim_ratio /*|| x < y * skip not possible*/)
+          continue;
         printf("%lu,%lu,%lu,%llu\n", x, y, z, benchmark(x, y, z));
         if (x != y)
           printf("%lu,%lu,%lu,%llu\n", y, x, z, benchmark(y, x, z));
@@ -346,6 +395,8 @@ template <bool Debug, typename P> void matmul(const nlohmann::json &json) {
           printf("%lu,%lu,%lu,%llu\n", z, y, x, benchmark(z, y, x));
       }
     }
+    step += step_growth;
+    sub_step += sub_step_growth;
   }
 }
 
@@ -353,6 +404,8 @@ template <bool Debug, typename P> void heap_alloc(const nlohmann::json &json) {
 
   uint32_t min = json.value("min-dimension", min_default);
   uint32_t max = json.value("max-dimension", max_default);
+  float step = (float)json.value("step", step_default);
+  float step_growth = json.value("step-growth", step_growth_default);
 
   auto benchmark = [&](uint32_t size) {
     // start clock
@@ -364,23 +417,24 @@ template <bool Debug, typename P> void heap_alloc(const nlohmann::json &json) {
 
     // prevent optimization (hopefully)
     A.setRandom();
-    volatile P sink = A(0, 0);
+    volatile P sink = A(random_range_32(0, size), random_range_32(0, size));
     (void)sink;
 
     return absolute_time_diff_us(startTime, stopTime);
   };
-  if constexpr (Debug) {
-    benchmark(min);
+  if constexpr (Debug)
     return;
-  }
 
   printf("size,time_us\n");
-  for (int i = min; i < max; i++) {
+  for (int i = min; i < max; i += (int)step) {
     printf("%lu,%llu\n", i, benchmark(i));
+    step += step_growth;
   }
 }
 
 template <bool Debug, typename P> void stack_alloc(const nlohmann::json &json) {
+  std::string name = json["benchmark"];
+  std::string precision = json.value("precision", precision_default);
 
   uint32_t iterations = json.value("iterations", 200);
 
@@ -394,25 +448,37 @@ template <bool Debug, typename P> void stack_alloc(const nlohmann::json &json) {
 
     // prevent optimization (hopefully)
     A.setRandom();
-    volatile P sink = A(0, 0);
+    volatile P sink =
+        A(random_range_32(0, max_default), random_range_32(0, max_default));
     (void)sink;
 
     return absolute_time_diff_us(startTime, stopTime);
   };
-  if constexpr (Debug) {
-    benchmark();
+  if constexpr (Debug)
     return;
-  }
 
+  // printf("SOF result %s %s\n", name.c_str(), precision.c_str());
   printf("size,time_us\n");
   for (int i = 0; i < iterations; i++) {
     printf("%lu,%llu\n", max_default, benchmark());
   }
+  // printf("EOF result %s %s\n", name.c_str(), precision.c_str());
+  // printf("EOT\n");
 }
 
+// copies a matrix from heap to heap
 template <bool Debug, typename P> void copy(const nlohmann::json &json) {
+  std::string name = json["benchmark"];
+  std::string precision = json.value("precision", precision_default);
+
   uint32_t min = json.value("min-dimension", min_default);
   uint32_t max = json.value("max-dimension", max_default);
+  float step = (float)json.value("step", step_default);
+  float step_growth = json.value("step-growth", step_growth_default);
+  float sub_step = json.value("sub-step", step);
+  float sub_step_growth = json.value("sub-step-growth", step_growth);
+
+  float dim_ratio = json.value("max-dim-ratio", dim_ratio_default);
 
   auto benchmark = [&](uint32_t x, uint32_t y) {
     GenericMatrix<P> A(x, y);
@@ -427,25 +493,100 @@ template <bool Debug, typename P> void copy(const nlohmann::json &json) {
     absolute_time_t stopTime = get_absolute_time();
 
     // prevent optimization (hopefully)
-    volatile P sink = R(0, 0);
+    volatile P sink = R(random_range_32(0, x), random_range_32(0, y));
     (void)sink;
 
     return absolute_time_diff_us(startTime, stopTime);
   };
-  if constexpr (Debug) {
-    benchmark(min, min);
+  if constexpr (Debug)
     return;
-  }
 
+  // printf("SOF result %s %s\n", name.c_str(), precision.c_str());
   printf("X,Y,time_us\n");
-  for (int x = min; x <= max; x++) {
-    for (int y = min; y <= x; y++) {
+  for (int x = min; x <= max; x += (int)step) {
+    for (int y = min; y <= x; y += (int)sub_step) {
       // cut out huge ratios
-      if (3 * y < x /*|| 3 * x < y not possible*/)
+      if (y < x * dim_ratio /*|| x < y * skip not possible*/)
         continue;
       printf("%lu,%lu,%llu\n", x, y, benchmark(x, y));
       if (y != x)
         printf("%lu,%lu,%llu\n", y, x, benchmark(y, x));
     }
+    step += step_growth;
+    sub_step += sub_step_growth;
   }
+  // printf("EOF result %s %s\n", name.c_str(), precision.c_str());
+  // printf("EOT\n");
+}
+
+// Generate a compile-time random array
+template <typename P, uint32_t X, uint32_t Y>
+constexpr std::array<P, X * Y> make_random_array() {
+  const auto lcg_next = [](uint32_t s) { return s * 1664525u + 1013904223u; };
+  auto gen_float = [](uint32_t s) { return s * (1.0 / 4294967296.0); };
+  std::array<P, X * Y> arr{};
+  uint32_t s = 0; // seed
+  for (uint32_t i = 0; i < X * Y; i++) {
+    s = lcg_next(s);
+    arr[i] = (P)gen_float(s);
+  }
+  return arr;
+}
+// initialize data in flash
+/* seems to compile correctly:
+ arm-none-eabi-nm --size-sort --print-size build/pico-benchmark.elf | c++filt |
+ grep data\<
+ */
+template <typename P, uint32_t X, uint32_t Y>
+const std::array<P, X * Y> data __attribute__((section(".rodata"))) =
+    make_random_array<P, X, Y>();
+//  copies a const matrix from flash to heap
+template <bool Debug, typename P> void read_flash(const nlohmann::json &json) {
+  std::string name = json["benchmark"];
+  std::string precision = json.value("precision", precision_default);
+
+  uint32_t iterations = json.value("iterations", min_default);
+
+  auto benchmark = [&]<uint32_t X, uint32_t Y>() {
+    // start clock
+    absolute_time_t startTime = get_absolute_time();
+    // perform calculation
+    Eigen::Map<const GenericMatrix<P>> R(data<P, X, Y>.data(), X, Y);
+    // stop clock
+    absolute_time_t stopTime = get_absolute_time();
+
+    // prevent optimization (hopefully)
+    volatile P sink = R(random_range_32(0, X), random_range_32(0, Y));
+    (void)sink;
+
+    uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
+    if constexpr (Debug) {
+      std::cout
+          << "–––––––––––––––––––––Testing algorithm––––––––––––––––––––––"
+          << std::endl;
+
+      std::cout << "R = " << std::endl << R << std::endl;
+      std::cout << "Time µs = " << time_us << std::endl;
+
+      std::cout
+          << "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
+          << std::endl;
+    }
+
+    return time_us;
+  };
+  if constexpr (Debug) {
+    benchmark.template operator()<6, 2>();
+    benchmark.template operator()<3, 3>();
+    benchmark.template operator()<5, 4>();
+    return;
+  }
+
+  // printf("SOF result %s %s\n", name.c_str(), precision.c_str());
+  printf("size,time_us\n");
+  for (int x = 0; x < iterations; x++) {
+    printf("%lu,%llu\n", x, benchmark.template operator()<200, 200>());
+  }
+  // printf("EOF result %s %s\n", name.c_str(), precision.c_str());
+  // printf("EOT\n");
 }

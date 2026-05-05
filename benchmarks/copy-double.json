@@ -2,5 +2,8 @@
   "benchmark": "copy",
   "precision": "double",
   "min-dimension": 5,
-  "max-dimension": 500
+  "max-dimension": 200,
+
+  "step": 2,
+  "max-dim-ratio": 0.2
 }

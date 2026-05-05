@@ -2,5 +2,6 @@
   "benchmark": "heap-alloc",
   "precision": "double",
   "min-dimension": 5,
-  "max-dimension": 500
+  "max-dimension": 500,
+  "step": 2
 }
