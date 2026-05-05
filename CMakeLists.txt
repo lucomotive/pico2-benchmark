@@ -22,6 +22,7 @@ include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 
 project(pico-benchmark C CXX ASM)
 
+
 # EIGEN FINDEN: Erlaube Suche auf dem Host-System (wichtig für Cross-Compiling)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
 find_package(Eigen3 REQUIRED NO_MODULE)
@@ -45,6 +46,7 @@ target_link_libraries(pico-benchmark
     pico_stdlib
     pico_rand
     pico_time
+    pico_multicore
     Eigen3::Eigen
     nlohmann_json::nlohmann_json
 )
