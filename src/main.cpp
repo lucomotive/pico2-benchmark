@@ -13,7 +13,7 @@ void parse_command(const nlohmann::json &json) {
   std::string precision = json.value("precision", "float");
 
   auto benchmark = [&]<bool Debug, typename P>() {
-    if (name == "determinant" || name = "det")
+    if (name == "determinant" || name == "det")
       determinant<Debug, P>(json);
     if (name == "inverse")
       inverse<Debug, P>(json);
