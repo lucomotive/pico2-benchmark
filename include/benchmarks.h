@@ -189,6 +189,8 @@ template <bool Debug, typename P> void lu(const nlohmann::json &json) {
   printf("X,Y,time_us\n");
   for (int x = min; x < max; x++) {
     for (int y = min; y < x; y++) {
+      if (3 * y < x /*|| 3 * x < y not possible*/)
+        continue;
       printf("%lu,%lu,%llu\n", x, y, benchmark(x, y));
     }
   }
@@ -272,6 +274,8 @@ template <bool Debug, typename P> void qr(const nlohmann::json &json) {
   printf("X,Y,time_us\n");
   for (int x = min; x <= max; x++) {
     for (int y = min; y <= x; y++) {
+      if (3 * y < x /*|| 3 * x < y not possible*/)
+        continue;
       printf("%lu,%lu,%llu\n", x, y, benchmark(x, y));
       if (x != y)
         printf("%lu,%lu,%llu\n", y, x, benchmark(y, x));
@@ -436,6 +440,9 @@ template <bool Debug, typename P> void copy(const nlohmann::json &json) {
   printf("X,Y,time_us\n");
   for (int x = min; x <= max; x++) {
     for (int y = min; y <= x; y++) {
+      // cut out huge ratios
+      if (3 * y < x /*|| 3 * x < y not possible*/)
+        continue;
       printf("%lu,%lu,%llu\n", x, y, benchmark(x, y));
       if (y != x)
         printf("%lu,%lu,%llu\n", y, x, benchmark(y, x));
