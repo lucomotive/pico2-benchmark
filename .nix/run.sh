@@ -27,6 +27,3 @@ if [ "$UF2" -nt "$STAMP" ]; then
 else
     echo "Build unchanged, skipping flash..."
 fi
-
-# start python console
-python console/main.py
