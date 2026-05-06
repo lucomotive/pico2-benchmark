@@ -533,13 +533,12 @@ constexpr std::array<P, X * Y> make_random_array() {
   return arr;
 }
 // initialize data in flash
-/* seems to compile correctly:
+/* seems to compile correctly to flash:
  arm-none-eabi-nm --size-sort --print-size build/pico-benchmark.elf | c++filt |
  grep data\<
  */
 template <typename P, uint32_t X, uint32_t Y>
-const std::array<P, X * Y> data __attribute__((section(".rodata"))) =
-    make_random_array<P, X, Y>();
+const std::array<P, X * Y> data = make_random_array<P, X, Y>();
 //  copies a const matrix from flash to heap
 template <bool Debug, typename P> void read_flash(const nlohmann::json &json) {
   std::string name = json["benchmark"];
@@ -551,7 +550,7 @@ template <bool Debug, typename P> void read_flash(const nlohmann::json &json) {
     // start clock
     absolute_time_t startTime = get_absolute_time();
     // perform calculation
-    Eigen::Map<const GenericMatrix<P>> R(data<P, X, Y>.data(), X, Y);
+    const Eigen::Map<const GenericMatrix<P>> R(data<P, X, Y>.data(), X, Y);
     // stop clock
     absolute_time_t stopTime = get_absolute_time();
 
