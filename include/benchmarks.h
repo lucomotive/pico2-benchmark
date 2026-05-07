@@ -4,6 +4,9 @@
 #include "pico/time.h"
 
 #include <Eigen/Dense>
+#include <array>
+#include <cstdint>
+#include <functional>
 #include <iostream>
 #include <nlohmann/json.hpp>
 
@@ -23,9 +26,9 @@ const float dim_ratio_default = 0.3;
 const float step_growth_default = 0.0;
 const char *precision_default = "float";
 
-const uint32_t DEBUG_BENCHMARK_COUNT = 3;
-const uint32_t DEBUG_BENCHMARK_MIN_DIM = 3;
-const uint32_t DEBUG_BENCHMARK_MAX_DIM = 10;
+const size_t DEBUG_BENCHMARK_COUNT = 3;
+const size_t DEBUG_BENCHMARK_MIN_DIM = 3;
+const size_t DEBUG_BENCHMARK_MAX_DIM = 10;
 
 template <typename P>
 using GenericMatrix = Eigen::Matrix<P, Eigen::Dynamic, Eigen::Dynamic>;
@@ -526,7 +529,7 @@ template <bool Debug, typename P> void copy(const nlohmann::json &json) {
   for (uint16_t x = min; x <= max; x += (uint16_t)step) {
     for (uint16_t y = min; y <= x; y += (uint16_t)sub_step) {
       // cut out huge ratios
-      if (y < x * dim_ratio /*|| x < y * skip not possible*/)
+      if ((float)y < (float)x * dim_ratio /*|| x < y * skip not possible*/)
         continue;
       printf("%lu,%lu,%llu\n", x, y, benchmark(x, y));
       if (y != x)
@@ -545,8 +548,19 @@ template <bool Debug, typename P> void copy(const nlohmann::json &json) {
  grep data\<
  */
 template <typename P, uint32_t X, uint32_t Y>
-const std::array<P, X * Y> data = ConstRand::random_const_array<P, X * Y>();
+const std::array<P, X * Y> data = ConstRand::random_float_array<P, X * Y>();
 
+/*template <uint32_t N, typename F> void repeat(F &&f) {
+  [&]<uint32_t... Is>(std::integer_sequence<uint32_t, Is...>) {
+    (f.template operator()<Is>(), ...);
+  }(std::make_integer_sequence<uint32_t, N>{});
+}*/
+template <uint32_t N, typename F> constexpr void repeat(F &&f) {
+  if constexpr (N > 0) {
+    f.template operator()<N - 1>();
+    repeat<N - 1>(std::forward<F>(f));
+  }
+}
 //  copies a const matrix from flash to heap
 template <bool Debug, typename P> void read_flash(const nlohmann::json &json) {
 
@@ -581,9 +595,14 @@ template <bool Debug, typename P> void read_flash(const nlohmann::json &json) {
     return time_us;
   };
   if constexpr (Debug) {
-    benchmark.template operator()<5, 3>();
-    benchmark.template operator()<3, 7>();
-    benchmark.template operator()<5, 12>();
+    constexpr auto dimensions =
+        ConstRand::random_int_array<uint32_t, DEBUG_BENCHMARK_COUNT * 2>(3, 10);
+    auto f = [&]<uint32_t n>() {
+      benchmark.template
+      operator()<dimensions[n], dimensions[DEBUG_BENCHMARK_COUNT + n]>();
+    };
+    repeat<DEBUG_BENCHMARK_COUNT>(f);
+
     return;
   }
 
@@ -671,8 +690,6 @@ template <bool Debug, typename P> void eigen(const nlohmann::json &json) {
   if constexpr (Debug) {
     for (uint32_t i = 0; i < DEBUG_BENCHMARK_COUNT; i++) {
       benchmark(
-          random_range_32(DEBUG_BENCHMARK_MIN_DIM, DEBUG_BENCHMARK_MAX_DIM),
-          random_range_32(DEBUG_BENCHMARK_MIN_DIM, DEBUG_BENCHMARK_MAX_DIM),
           random_range_32(DEBUG_BENCHMARK_MIN_DIM, DEBUG_BENCHMARK_MAX_DIM));
     }
     return;
@@ -733,7 +750,6 @@ template <bool Debug, typename P> void rank(const nlohmann::json &json) {
   if constexpr (Debug) {
     for (uint32_t i = 0; i < DEBUG_BENCHMARK_COUNT; i++) {
       benchmark(
-          random_range_32(DEBUG_BENCHMARK_MIN_DIM, DEBUG_BENCHMARK_MAX_DIM),
           random_range_32(DEBUG_BENCHMARK_MIN_DIM, DEBUG_BENCHMARK_MAX_DIM),
           random_range_32(DEBUG_BENCHMARK_MIN_DIM, DEBUG_BENCHMARK_MAX_DIM));
     }
