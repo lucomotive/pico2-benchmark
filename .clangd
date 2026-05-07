@@ -1,9 +1,15 @@
 CompileFlags:
-  Add:
-    - --target=arm-none-eabi
-    - arm-none-eabi-gcc -print-file-name=include
-  Remove:
-    - -march=*
-    - -mcpu=*
-    - -mfpu=*
-    - -mfloat-abi=*
+  #Add:
+  #- "--target=arm-none-eabi"
+  #- "-mcpu=cortex-m33"
+  #- "--include-directory=include"
+  #Remove:
+  #- "-fno-tree-loop-distribute-patterns"
+  #- "-fconserve-stack"
+  CompilationDatabase: build/
+
+InlayHints:
+  Enabled: true
+  DeducedTypes: true
+  Designators: true
+  ParameterNames: true

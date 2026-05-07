@@ -43,6 +43,7 @@ mkShell {
 
     # Optional: C/C++ language server for your editor
     clang-tools
+
   ];
 
   shellHook = ''

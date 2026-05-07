@@ -9,7 +9,7 @@ Hier werden die Benchmark-Ergebnisse gespeichert.
 Der pico 2 kommuniziert mit einem python script, dass anweisung gibt welches benchmark mit welcher präzision (float/double) durchgeführt werden soll.
 
 ### src + include
-hier sind ist der code für den pico 2 und das python script abgelegt
+hier sind ist der code für den pico 2 abgelegt
 
 ### console
 hier ist ein python script um den pico 2 zu steuern
@@ -20,7 +20,7 @@ das python script kommuniziert mit dem microcontroller. in der konsole kann hier
 python console/main.py --file=benchmarks/qr-float.json 
 ```
 ein benchmark gestartet werden.
-Das script erstell automatisch eine datei und legt die ergebnisse ab
+Das script erstell automatisch eine .csv datei und legt die ergebnisse ab
 
 
 ## Fertige Benchmarks
@@ -32,6 +32,7 @@ Das script erstell automatisch eine datei und legt die ergebnisse ab
 - Copy
 - Stack allocation
 - Heap allocation
+- flash read
 
 ## Geplante Benchmarks
 - Division (matmul mit Inverse) (überflüssig)
@@ -53,6 +54,7 @@ Das script erstell automatisch eine datei und legt die ergebnisse ab
 Jede Matrix-Operation wird mit verschiedenen Größen getestet um einen qualifizierten Vergleich zu erhalten.
 - Geschwindigkeit
 - Stromverbrauch
+- präzision
 
 ### Hardware
 - PICO 1

@@ -20,7 +20,7 @@ fi
 # flash only if .uf2 is newer that stamp
 if [ "$UF2" -nt "$STAMP" ]; then
     echo "Flashing $UF2..."
-    sudo picotool load "$UF2" --force --execute
+    picotool load "$UF2" --force --execute
     touch "$STAMP"
     echo "Waiting for pico to start..."
     sleep 3
