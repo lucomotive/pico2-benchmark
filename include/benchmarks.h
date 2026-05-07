@@ -6,7 +6,6 @@
 #include <Eigen/Dense>
 #include <array>
 #include <cstdint>
-#include <functional>
 #include <iostream>
 #include <nlohmann/json.hpp>
 
@@ -404,8 +403,9 @@ template <bool Debug, typename P> void matmul(const nlohmann::json &json) {
   for (uint16_t x = min; x <= max; x += (uint16_t)step) {
     for (uint16_t y = min; y <= x; y += (uint16_t)sub_step) {
       for (uint16_t z = min; z <= y; z += (uint16_t)sub_step) {
-        if (y < x * dim_ratio || z < y * dim_ratio ||
-            z < x * dim_ratio /*|| x < y * skip not possible*/)
+        if ((float)y < (float)x * dim_ratio ||
+            (float)z < (float)y * dim_ratio ||
+            (float)z < (float)x * dim_ratio /*|| x < y * skip not possible*/)
           continue;
         printf("%lu,%lu,%lu,%llu\n", x, y, z, benchmark(x, y, z));
         if (x != y)
@@ -759,7 +759,7 @@ template <bool Debug, typename P> void rank(const nlohmann::json &json) {
   printf("X,Y,time_us\n");
   for (uint16_t x = min; x <= max; x += (uint16_t)step) {
     for (uint16_t y = min; y <= x; y += (uint16_t)sub_step) {
-      if (y < x * dim_ratio /*|| x < y * skip not possible*/)
+      if ((float)y < (float)x * dim_ratio /*|| x < y * skip not possible*/)
         continue;
       printf("%lu,%lu,%llu\n", x, y, benchmark(x, y));
       if (x != y)
