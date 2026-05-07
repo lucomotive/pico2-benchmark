@@ -589,3 +589,160 @@ template <bool Debug, typename P> void read_flash(const nlohmann::json &json) {
   // printf("EOF result %s %s\n", name.c_str(), precision.c_str());
   // printf("EOT\n");
 }
+
+template <bool Debug, typename P> void eigen(const nlohmann::json &json) {
+  std::string name = json["benchmark"];
+  std::string precision = json.value("precision", precision_default);
+
+  uint32_t min = json.value("min-dimension", min_default);
+  uint32_t max = json.value("max-dimension", max_default);
+
+  float step = (float)json.value("step", step_default);
+  float step_growth = json.value("step-growth", step_growth_default);
+
+  auto benchmark = [&](uint32_t size) -> std::pair<uint64_t, bool> {
+    GenericMatrix<P> A(size, size);
+    A.setRandom();
+
+    // start clock
+    absolute_time_t startTime = get_absolute_time();
+    // perform calculation
+    Eigen::SelfAdjointEigenSolver<GenericMatrix<P>> eigensolver(A);
+
+    // stop clock
+    absolute_time_t stopTime_1 = get_absolute_time();
+    uint64_t time_1_us = absolute_time_diff_us(startTime, stopTime_1);
+
+    // if not existant, exit
+    if (eigensolver.info() != Eigen::Success) {
+      if constexpr (Debug) {
+        std::cout
+            << "–––––––––––––––––––––Testing algorithm––––––––––––––––––––––"
+            << std::endl;
+
+        std::cout << "A = " << std::endl << A << std::endl;
+        std::cout << "Time µs = " << time_1_us << std::endl;
+        std::cout << "Not computable" << std::endl;
+
+        std::cout
+            << "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
+            << std::endl;
+      }
+
+      return {time_1_us, false};
+    }
+
+    auto values = eigensolver.eigenvalues();
+    auto vectors = eigensolver.eigenvectors();
+
+    // stop clock
+    absolute_time_t stopTime_2 = get_absolute_time();
+    uint64_t time_2_us = absolute_time_diff_us(startTime, stopTime_2);
+
+    // prevent optimization (hopefully)
+    volatile P sinkVal = values(random_range_32(0, size));
+    (void)sinkVal;
+    volatile P sinkVec =
+        vectors(random_range_32(0, size), random_range_32(0, size));
+    (void)sinkVec;
+
+    if constexpr (Debug) {
+      std::cout
+          << "–––––––––––––––––––––Testing algorithm––––––––––––––––––––––"
+          << std::endl;
+
+      std::cout << "A = " << std::endl << A << std::endl;
+      std::cout << "Values = " << std::endl << values << std::endl;
+      std::cout << "Vectors = " << std::endl << vectors << std::endl;
+
+      std::cout << "Time µs = " << time_2_us << std::endl;
+
+      std::cout
+          << "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
+          << std::endl;
+    }
+
+    return {time_2_us, true};
+  };
+  if constexpr (Debug) {
+    benchmark(5);
+    benchmark(12);
+    benchmark(7);
+    return;
+  }
+
+  // printf("SOF result %s %s\n", name.c_str(), precision.c_str());
+  printf("size,time_us,computable\n");
+  for (int x = min; x < max; x += step) {
+    auto [time_us, computable] = benchmark(x);
+    printf("%lu,%llu,%s\n", x, time_us, computable ? "true" : "false");
+    step += step_growth;
+  }
+  // printf("EOF result %s %s\n", name.c_str(), precision.c_str());
+  // printf("EOT\n");
+}
+
+template <bool Debug, typename P> void rank(const nlohmann::json &json) {
+  uint32_t min = json.value("min-dimension", min_default);
+  uint32_t max = json.value("max-dimension", max_default);
+  float step = (float)json.value("step", step_default);
+  float step_growth = json.value("step-growth", step_growth_default);
+  float sub_step = json.value("sub-step", step);
+  float sub_step_growth = json.value("sub-step-growth", step_growth);
+
+  float dim_ratio = json.value("max-dim-ratio", dim_ratio_default);
+
+  auto benchmark = [&](uint32_t x, uint32_t y) -> uint64_t {
+    GenericMatrix<P> A(x, y);
+    A.setRandom();
+
+    // start clock
+    absolute_time_t startTime = get_absolute_time();
+
+    // perform calculation
+    Eigen::FullPivLU<GenericMatrix<P>> lu(A);
+    volatile auto rank = lu.rank();
+
+    // stop clock
+    absolute_time_t stopTime = get_absolute_time();
+    uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
+
+    // prevent optimization (hopefully)
+    (void)rank;
+
+    if constexpr (Debug) {
+      std::cout
+          << "–––––––––––––––––––––Testing algorithm––––––––––––––––––––––"
+          << std::endl;
+
+      std::cout << "A = " << std::endl << A << std::endl;
+      std::cout << "Rank = " << std::endl << rank << std::endl;
+      std::cout << "Time µs = " << time_us << std::endl;
+
+      std::cout
+          << "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
+          << std::endl;
+    }
+
+    return time_us;
+  };
+  if constexpr (Debug) {
+    benchmark(5, 3);
+    benchmark(12, 7);
+    benchmark(3, 7);
+    return;
+  }
+
+  printf("X,Y,time_us\n");
+  for (int x = min; x <= max; x += (int)step) {
+    for (int y = min; y <= x; y += (int)sub_step) {
+      if (y < x * dim_ratio /*|| x < y * skip not possible*/)
+        continue;
+      printf("%lu,%lu,%llu\n", x, y, benchmark(x, y));
+      if (x != y)
+        printf("%lu,%lu,%llu\n", y, x, benchmark(y, x));
+    }
+    step += step_growth;
+    sub_step += sub_step_growth;
+  }
+}

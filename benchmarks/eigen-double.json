@@ -1,0 +1,9 @@
+{
+  "benchmark": "eigen-values",
+  "precision": "double",
+  "min-dimension": 5,
+  "max-dimension": 500,
+
+  "step": 2,
+  "step-growth": 0.05
+}

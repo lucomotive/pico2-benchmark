@@ -31,6 +31,10 @@ void parse_command(const nlohmann::json &json) {
       copy<Debug, P>(json);
     if (name == "read-flash")
       read_flash<Debug, P>(json);
+    if (name == "eigen-values")
+      eigen<Debug, P>(json);
+    if (name == "rank")
+      rank<Debug, P>(json);
   };
 
   auto run = [&]<typename P>() {
