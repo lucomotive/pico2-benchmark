@@ -1,12 +1,17 @@
 
 #include <benchmarks.h>
 
+#include "pico/multicore.h"
 #include "pico/stdlib.h"
 
-#include <iostream>
-#include <string.h>
+#include <cstdio>
+#include <pico/time.h>
+#include <string>
 
 #include <nlohmann/json.hpp>
+
+// want to run benchmarks on thread?
+#define MULITCORE true
 
 void parse_command(const nlohmann::json &json) {
   std::string name = json["benchmark"];
@@ -54,6 +59,18 @@ void parse_command(const nlohmann::json &json) {
   }
 }
 
+#if MULITCORE
+void core1_main() {
+  while (true) {
+    auto *json = (nlohmann::basic_json<> *)multicore_fifo_pop_blocking();
+    parse_command(*json);
+    delete json; // delete from memory
+    // send nullptr as confirmation
+    multicore_fifo_push_blocking(0);
+  }
+}
+#endif
+
 int main() {
   stdio_init_all();
 
@@ -62,12 +79,15 @@ int main() {
     sleep_ms(100);
   }
 
-  char command[256];
+  multicore_launch_core1(core1_main);
+
+  const uint32_t BUFFER_SIZE = 256;
+  char buffer[BUFFER_SIZE];
   while (true) {
     // wait for command
-    gets(command);
+    fgets(buffer, BUFFER_SIZE, stdin);
 
-    if (strlen(command) == 0) {
+    if (strlen(buffer) == 0) {
       sleep_ms(100);
       continue;
     }
@@ -84,10 +104,16 @@ int main() {
     //
     //   "iterations": "<some int>"
     // }
-    auto json = nlohmann::json::parse(command);
 
+#if MULITCORE
+    auto *json = new nlohmann::basic_json<>(
+        nlohmann::json::parse(buffer)); // move to heap
+    // move to thread
+    multicore_fifo_push_blocking((uint32_t)json);
+    auto response = multicore_fifo_pop_blocking(); // wait for response
+#else
+    auto json = nlohmann::json::parse(buffer);
     parse_command(json);
-
-    fflush(stdout);
+#endif
   }
 }
