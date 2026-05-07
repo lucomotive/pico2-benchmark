@@ -79,7 +79,9 @@ int main() {
     sleep_ms(100);
   }
 
+#if MULITCORE
   multicore_launch_core1(core1_main);
+#endif
 
   const uint32_t BUFFER_SIZE = 256;
   char buffer[BUFFER_SIZE];
