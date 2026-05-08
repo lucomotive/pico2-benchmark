@@ -28,9 +28,15 @@ https://de.wikipedia.org/wiki/JSON-RPC
 }
 ```
 Erlaubte parameter:
+- precision: float oder double. mit welchem datentyp der benchmark durchgeführt werden soll
 - min-dimension: die kleinst-mögliche größe der vom benchmark evaluierten matrizen (gilt für alle dimensionen)
 - max-dimension: die höchst-mögliche größe der vom benchmark evaluierten matrizen (gilt für alle dimensionen)
 - step: 
+- step-growth:
+- sub-step:
+- sub-step-growth:
+- max-dim-ratio:
+- iterations:
 
 ## Python script
 das python script kommuniziert mit dem microcontroller. in der konsole kann hier mit 
