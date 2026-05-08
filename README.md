@@ -14,6 +14,24 @@ hier sind ist der code für den pico 2 abgelegt
 ### console
 hier ist ein python script um den pico 2 zu steuern
 
+### benchmarks
+hier sind die benchmark als "tasks" im json format abgelegt.
+Das protokoll ist am json-rpc protokoll angelehnt
+https://de.wikipedia.org/wiki/JSON-RPC
+```json
+{
+  "benchmark": "<benchmark>",
+  "params": {
+    "precision": "<float|double>",
+    ...
+  }
+}
+```
+Erlaubte parameter:
+- min-dimension: die kleinst-mögliche größe der vom benchmark evaluierten matrizen (gilt für alle dimensionen)
+- max-dimension: die höchst-mögliche größe der vom benchmark evaluierten matrizen (gilt für alle dimensionen)
+- step: 
+
 ## Python script
 das python script kommuniziert mit dem microcontroller. in der konsole kann hier mit 
 ```

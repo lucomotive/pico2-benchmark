@@ -1,5 +1,7 @@
 {
   "benchmark": "read-flash",
-  "precision": "float",
-  "iterations": 100
+  "params": {
+    "precision": "float",
+    "iterations": 100
+  }
 }

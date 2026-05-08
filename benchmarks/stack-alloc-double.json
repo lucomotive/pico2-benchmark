@@ -1,6 +1,8 @@
 {
   "benchmark": "stack-alloc",
-  "precision": "double",
-  "min-dimension": 5,
-  "max-dimension": 500
+  "params": {
+    "precision": "double",
+    "min-dimension": 5,
+    "max-dimension": 500
+  }
 }
