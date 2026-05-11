@@ -40,6 +40,8 @@ void parse_command(const nlohmann::json &json) {
       eigen<Debug, P>(json);
     if (name == "rank")
       rank<Debug, P>(json);
+    if (name == "llt")
+      llt<Debug, P>(json);
   };
 
   auto run = [&]<typename P>() {
@@ -71,6 +73,7 @@ void core1_main() {
 }
 #endif
 
+// 153DAE50CB3F2B4D
 int main() {
   stdio_init_all();
 

@@ -4,6 +4,8 @@
 #include "pico/time.h"
 
 #include <Eigen/Dense>
+#include <Eigen/src/Cholesky/LLT.h>
+#include <Eigen/src/Core/Matrix.h>
 #include <array>
 #include <cstdint>
 #include <iostream>
@@ -31,6 +33,7 @@ const size_t DEBUG_BENCHMARK_MAX_DIM = 10;
 
 template <typename P>
 using GenericMatrix = Eigen::Matrix<P, Eigen::Dynamic, Eigen::Dynamic>;
+template <typename P> using GenericVector = Eigen::Vector<P, Eigen::Dynamic>;
 
 uint32_t random_range_32(uint32_t low, uint32_t high) {
   return low + (get_rand_32() % (high - low));
@@ -623,7 +626,7 @@ template <bool Debug, typename P> void eigen(const nlohmann::json &json) {
   float step = json.value("step", (float)step_default);
   float step_growth = json.value("step-growth", step_growth_default);
 
-  auto benchmark = [&](uint16_t size) -> std::pair<uint64_t, bool> {
+  auto benchmark = [&](uint16_t size) -> std::tuple<uint64_t, bool> {
     GenericMatrix<P> A(size, size);
     A.setRandom();
 
@@ -632,19 +635,19 @@ template <bool Debug, typename P> void eigen(const nlohmann::json &json) {
     // perform calculation
     Eigen::SelfAdjointEigenSolver<GenericMatrix<P>> eigensolver(A);
 
-    // stop clock
-    absolute_time_t stopTime_1 = get_absolute_time();
-    uint64_t time_1_us = absolute_time_diff_us(startTime, stopTime_1);
-
     // if not existant, exit
     if (eigensolver.info() != Eigen::Success) {
+      // stop clock
+      absolute_time_t stopTime = get_absolute_time();
+      uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
+
       if constexpr (Debug) {
         std::cout
             << "–––––––––––––––––––––Testing algorithm––––––––––––––––––––––"
             << std::endl;
 
         std::cout << "A = " << std::endl << A << std::endl;
-        std::cout << "Time µs = " << time_1_us << std::endl;
+        std::cout << "Time µs = " << time_us << std::endl;
         std::cout << "Not computable" << std::endl;
 
         std::cout
@@ -652,15 +655,15 @@ template <bool Debug, typename P> void eigen(const nlohmann::json &json) {
             << std::endl;
       }
 
-      return {time_1_us, false};
+      return {time_us, false};
     }
 
     auto values = eigensolver.eigenvalues();
     auto vectors = eigensolver.eigenvectors();
 
     // stop clock
-    absolute_time_t stopTime_2 = get_absolute_time();
-    uint64_t time_2_us = absolute_time_diff_us(startTime, stopTime_2);
+    absolute_time_t stopTime = get_absolute_time();
+    uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
 
     // prevent optimization (hopefully)
     volatile P sinkVal = values(random_range_32(0, size));
@@ -678,14 +681,14 @@ template <bool Debug, typename P> void eigen(const nlohmann::json &json) {
       std::cout << "Values = " << std::endl << values << std::endl;
       std::cout << "Vectors = " << std::endl << vectors << std::endl;
 
-      std::cout << "Time µs = " << time_2_us << std::endl;
+      std::cout << "Time µs = " << time_us << std::endl;
 
       std::cout
           << "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
           << std::endl;
     }
 
-    return {time_2_us, true};
+    return {time_us, true};
   };
   if constexpr (Debug) {
     for (uint32_t i = 0; i < DEBUG_BENCHMARK_COUNT; i++) {
@@ -698,7 +701,7 @@ template <bool Debug, typename P> void eigen(const nlohmann::json &json) {
   printf("size,time_us,computable\n");
   for (uint16_t x = min; x < max; x += (uint16_t)step) {
     auto [time_us, computable] = benchmark(x);
-    printf("%lu,%llu,%s\n", x, time_us, computable ? "true" : "false");
+    printf("%lu,%llu,%d\n", x, time_us, computable);
     step += step_growth;
   }
 }
@@ -768,4 +771,119 @@ template <bool Debug, typename P> void rank(const nlohmann::json &json) {
     step += step_growth;
     sub_step += sub_step_growth;
   }
+}
+
+// after this example:
+// https://libeigen.gitlab.io/eigen/docs-3.4/group__TopicSparseSystems.html#TheSparseSolve
+template <bool Debug, typename P> void llt(const nlohmann::json &json) {
+  uint16_t min = json.value("min-dimension", min_default);
+  uint16_t max = json.value("max-dimension", max_default);
+  float step = json.value("step", (float)step_default);
+  float step_growth = json.value("step-growth", step_growth_default);
+
+  // returns tuple{time, decomposition, solved}
+  auto benchmark = [&](uint16_t size) -> std::tuple<uint64_t, bool, bool> {
+    GenericMatrix<P> A(size, size);
+    A.setRandom();
+    // A must be SPD matrix
+    A = (A.transpose() * A) +
+        (GenericMatrix<P>::Identity(size, size) * (P)size);
+
+    GenericVector<P> B(size);
+    B.setRandom();
+
+    // start clock
+    absolute_time_t startTime = get_absolute_time();
+
+    Eigen::LLT<GenericMatrix<P>> solver;
+    solver.compute(A);
+    if (solver.info() != Eigen::Success) {
+      // decomposition failed
+      absolute_time_t stopTime = get_absolute_time();
+      uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
+
+      if constexpr (Debug) {
+        std::cout
+            << "–––––––––––––––––––––Testing algorithm––––––––––––––––––––––"
+            << std::endl;
+
+        std::cout << "A = " << std::endl << A << std::endl;
+        std::cout << "B = " << std::endl << B << std::endl;
+        std::cout << "Decomposition failed" << std::endl;
+        std::cout << "Time µs = " << time_us << std::endl;
+
+        std::cout
+            << "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
+            << std::endl;
+      }
+
+      return {time_us, false, false};
+    }
+    auto res = solver.solve(B);
+    if (solver.info() != Eigen::Success) {
+      // solving failed
+      absolute_time_t stopTime = get_absolute_time();
+      uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
+
+      if constexpr (Debug) {
+        std::cout
+            << "–––––––––––––––––––––Testing algorithm––––––––––––––––––––––"
+            << std::endl;
+
+        std::cout << "A = " << std::endl << A << std::endl;
+        std::cout << "B = " << std::endl << B << std::endl;
+        std::cout << "Solving failed" << std::endl;
+        std::cout << "Time µs = " << time_us << std::endl;
+
+        std::cout
+            << "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
+            << std::endl;
+      }
+
+      return {time_us, true, false};
+    }
+
+    // stop clock
+    absolute_time_t stopTime = get_absolute_time();
+    uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
+
+    // prevent optimization (hopefully)
+    volatile P sink = res(random_range_32(0, size));
+    (void)sink;
+
+    if constexpr (Debug) {
+      std::cout
+          << "–––––––––––––––––––––Testing algorithm––––––––––––––––––––––"
+          << std::endl;
+
+      std::cout << "A = " << std::endl << A << std::endl;
+      std::cout << "B = " << std::endl << B << std::endl;
+      std::cout << "R = " << std::endl << res << std::endl;
+      std::cout << "Time µs = " << time_us << std::endl;
+
+      std::cout
+          << "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
+          << std::endl;
+    }
+
+    return {
+        time_us,
+        true,
+        true,
+    };
+  };
+  if constexpr (Debug) {
+    for (uint32_t i = 0; i < DEBUG_BENCHMARK_COUNT; i++) {
+      benchmark(
+          random_range_32(DEBUG_BENCHMARK_MIN_DIM, DEBUG_BENCHMARK_MAX_DIM));
+    }
+    return;
+  }
+
+  printf("size,time_us,decomposition,solved\n");
+  for (uint16_t x = min; x <= max; x += (uint16_t)step) {
+    auto [time, dec, sol] = benchmark(x);
+    printf("%lu,%llu,%d,%d\n", x, time, dec, sol);
+  }
+  step += step_growth;
 }
