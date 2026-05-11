@@ -25,13 +25,6 @@ https://de.wikipedia.org/wiki/JSON-RPC
     //float oder double. mit welchem datentyp der benchmark durchgeführt werden soll
     "precision": "<float|double>",
     ...
-    // define rules for benchmark, which matrices to run
-  
-
-    
-    
-
-    
   }
 }
 ```

@@ -560,11 +560,6 @@ template <bool Debug, typename P> void copy(const nlohmann::json &json) {
 template <typename P, uint32_t X, uint32_t Y>
 const std::array<P, X * Y> data = ConstRand::random_float_array<P, X * Y>();
 
-/*template <uint32_t N, typename F> void repeat(F &&f) {
-  [&]<uint32_t... Is>(std::integer_sequence<uint32_t, Is...>) {
-    (f.template operator()<Is>(), ...);
-  }(std::make_integer_sequence<uint32_t, N>{});
-}*/
 template <uint32_t N, typename F> constexpr void repeat(F &&f) {
   if constexpr (N > 0) {
     f.template operator()<N - 1>();

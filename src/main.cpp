@@ -10,7 +10,7 @@
 
 #include <nlohmann/json.hpp>
 
-// want to run benchmarks on thread?
+// want to run benchmarks on other core?
 #define MULITCORE true
 
 void parse_command(const nlohmann::json &json) {
@@ -73,6 +73,7 @@ void core1_main() {
 #endif
 
 int main() {
+
   stdio_init_all();
 
   // wait for PC to open console
@@ -87,33 +88,21 @@ int main() {
   const uint32_t BUFFER_SIZE = 256;
   char buffer[BUFFER_SIZE];
   while (true) {
-    // wait for command
+    // wait for command from usb
     fgets(buffer, BUFFER_SIZE, stdin);
 
+    // if empty do it again. but wait 100ms
     if (strlen(buffer) == 0) {
       sleep_ms(100);
       continue;
     }
-
-    // parse to json
-    // expects:
-    // {
-    //   "benchmark": "<benchmark-name>",
-    //   "precision": "<float|double>",
-    //
-    //   # the minimal possible size for the matrices used in the benchmark
-    //   "min-dimension": "<some int>",
-    //   "max-dimension": "<some int>",
-    //
-    //   "iterations": "<some int>"
-    // }
 
 #if MULITCORE
     auto *json = new nlohmann::basic_json<>(
         nlohmann::json::parse(buffer)); // move to heap
     // move to thread
     multicore_fifo_push_blocking((uint32_t)json);
-    auto response = multicore_fifo_pop_blocking(); // wait for response
+    auto _response = multicore_fifo_pop_blocking(); // wait for response
 #else
     auto json = nlohmann::json::parse(buffer);
     parse_command(json);
