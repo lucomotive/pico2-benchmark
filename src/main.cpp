@@ -16,7 +16,7 @@
 void parse_command(const nlohmann::json &json) {
   std::string name = json["benchmark"];
   auto params = json["params"];
-  std::string precision = params.value("precision", precision_default);
+  std::string precision = params.value("precision", Defaults::precision);
 
   auto benchmark = [&]<bool Debug, typename P>() {
     if (name == "determinant" || name == "det")
