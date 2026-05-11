@@ -1,13 +1,15 @@
 {
   "benchmark": "matmul",
-  "precision": "double",
-  "min-dimension": 5,
-  "max-dimension": 500,
+  "params": {
+    "precision": "double",
+    "min-dimension": 5,
+    "max-dimension": 500,
 
-  "step": 3,
-  "step-growth": 0.15,
-  "sub-step": 6,
-  "sub-step-growth": 0.25,
+    "step": 3,
+    "step-growth": 0.15,
+    "sub-step": 6,
+    "sub-step-growth": 0.25,
 
-  "max-dim-ratio": 0.4
+    "max-dim-ratio": 0.4
+  }
 }

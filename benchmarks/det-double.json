@@ -1,8 +1,10 @@
 {
   "benchmark": "det",
-  "precision": "double",
-  "min-dimension": 5,
-  "max-dimension": 500,
-  "step": 2,
-  "step-growth": 0.05
+  "params": {
+    "precision": "double",
+    "min-dimension": 5,
+    "max-dimension": 500,
+    "step": 2,
+    "step-growth": 0.05
+  }
 }

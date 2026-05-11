@@ -1,7 +1,9 @@
 {
   "benchmark": "heap-alloc",
-  "precision": "float",
-  "min-dimension": 5,
-  "max-dimension": 500,
-  "step": 2
+  "params": {
+    "precision": "float",
+    "min-dimension": 5,
+    "max-dimension": 500,
+    "step": 2
+  }
 }
