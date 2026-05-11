@@ -34,6 +34,7 @@ const size_t DEBUG_BENCHMARK_MAX_DIM = 10;
 template <typename P>
 using GenericMatrix = Eigen::Matrix<P, Eigen::Dynamic, Eigen::Dynamic>;
 template <typename P> using GenericVector = Eigen::Vector<P, Eigen::Dynamic>;
+using Time = int64_t;
 
 uint32_t random_range_32(uint32_t low, uint32_t high) {
   return low + (get_rand_32() % (high - low));
@@ -45,7 +46,7 @@ template <bool Debug, typename P> void inverse(const nlohmann::json &json) {
   auto step = (float)json.value("step", step_default);
   float step_growth = json.value("step-growth", step_growth_default);
 
-  auto benchmark = [&](uint16_t size) -> uint64_t {
+  auto benchmark = [&](uint16_t size) -> Time {
     GenericMatrix<P> source(size, size);
     // random values
     source.setRandom();
@@ -63,7 +64,7 @@ template <bool Debug, typename P> void inverse(const nlohmann::json &json) {
         result(random_range_32(0, size), random_range_32(0, size));
     (void)sink;
 
-    uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
+    Time time_us = absolute_time_diff_us(startTime, stopTime);
 
     // debug results
     if constexpr (Debug) {
@@ -104,7 +105,7 @@ template <bool Debug, typename P> void determinant(const nlohmann::json &json) {
   auto step = (float)json.value("step", step_default);
   float step_growth = json.value("step-growth", step_growth_default);
 
-  auto benchmark = [&](uint16_t size) -> uint64_t {
+  auto benchmark = [&](uint16_t size) -> Time {
     GenericMatrix<P> source(size, size);
     // random values
     source.setRandom();
@@ -123,7 +124,7 @@ template <bool Debug, typename P> void determinant(const nlohmann::json &json) {
     (void)sink;
     (void)res;
 
-    uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
+    Time time_us = absolute_time_diff_us(startTime, stopTime);
 
     // debug results
     if constexpr (Debug) {
@@ -168,7 +169,7 @@ template <bool Debug, typename P> void lu(const nlohmann::json &json) {
 
   float dim_ratio = json.value("max-dim-ratio", dim_ratio_default);
 
-  auto benchmark = [&](uint16_t x, uint16_t y) -> uint64_t {
+  auto benchmark = [&](uint16_t x, uint16_t y) -> Time {
     GenericMatrix<P> source(x, y);
     // random values
     source.setRandom();
@@ -192,7 +193,7 @@ template <bool Debug, typename P> void lu(const nlohmann::json &json) {
     volatile P sinkL = L(random_range_32(0, x), random_range_32(0, x));
     (void)sinkL;
 
-    uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
+    Time time_us = absolute_time_diff_us(startTime, stopTime);
 
     // debug results
     if constexpr (Debug) {
@@ -253,7 +254,7 @@ template <bool Debug, typename P> void qr(const nlohmann::json &json) {
 
   float dim_ratio = json.value("max-dim-ratio", dim_ratio_default);
 
-  auto benchmark = [&](uint16_t x, uint16_t y) -> uint64_t {
+  auto benchmark = [&](uint16_t x, uint16_t y) -> Time {
     GenericMatrix<P> source(x, y);
     // random values
     source.setRandom();
@@ -274,7 +275,7 @@ template <bool Debug, typename P> void qr(const nlohmann::json &json) {
     volatile P sink = R(random_range_32(0, y), random_range_32(0, y));
     (void)sink;
 
-    uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
+    Time time_us = absolute_time_diff_us(startTime, stopTime);
 
     // debug results
     if constexpr (Debug) {
@@ -352,7 +353,7 @@ template <bool Debug, typename P> void matmul(const nlohmann::json &json) {
 
   float dim_ratio = json.value("max-dim-ratio", dim_ratio_default);
 
-  auto benchmark = [&](uint16_t x, uint16_t y, uint16_t z) -> uint64_t {
+  auto benchmark = [&](uint16_t x, uint16_t y, uint16_t z) -> Time {
     // allocate matrices
     GenericMatrix<P> M1(x, y);
     GenericMatrix<P> M2(y, z);
@@ -371,7 +372,7 @@ template <bool Debug, typename P> void matmul(const nlohmann::json &json) {
     volatile P sink = R(random_range_32(0, x), random_range_32(0, z));
     (void)sink;
 
-    uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
+    Time time_us = absolute_time_diff_us(startTime, stopTime);
 
     // debug results
     if constexpr (Debug) {
@@ -431,7 +432,7 @@ template <bool Debug, typename P> void heap_alloc(const nlohmann::json &json) {
   float step = json.value("step", (float)step_default);
   float step_growth = json.value("step-growth", step_growth_default);
 
-  auto benchmark = [&](uint16_t size) {
+  auto benchmark = [&](uint16_t size) -> Time {
     // start clock
     absolute_time_t startTime = get_absolute_time();
     // perform calculation
@@ -462,7 +463,7 @@ template <bool Debug, typename P> void heap_alloc(const nlohmann::json &json) {
 template <bool Debug, typename P> void stack_alloc(const nlohmann::json &json) {
   uint16_t iterations = json.value("iterations", iterations_default);
 
-  auto benchmark = [&]() {
+  auto benchmark = [&]() -> Time {
     // start clock
     absolute_time_t startTime = get_absolute_time();
     // perform calculation
@@ -504,7 +505,7 @@ template <bool Debug, typename P> void copy(const nlohmann::json &json) {
 
   float dim_ratio = json.value("max-dim-ratio", dim_ratio_default);
 
-  auto benchmark = [&](uint16_t x, uint16_t y) {
+  auto benchmark = [&](uint16_t x, uint16_t y) -> Time {
     GenericMatrix<P> source(x, y);
     // random values
     source.setRandom();
@@ -569,7 +570,7 @@ template <bool Debug, typename P> void read_flash(const nlohmann::json &json) {
 
   uint16_t iterations = json.value("iterations", iterations_default);
 
-  auto benchmark = [&]<uint16_t X, uint16_t Y>() {
+  auto benchmark = [&]<uint16_t X, uint16_t Y>() -> Time {
     // start clock
     absolute_time_t startTime = get_absolute_time();
     // perform calculation
@@ -581,7 +582,7 @@ template <bool Debug, typename P> void read_flash(const nlohmann::json &json) {
     volatile P sink = R(random_range_32(0, X), random_range_32(0, Y));
     (void)sink;
 
-    uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
+    Time time_us = absolute_time_diff_us(startTime, stopTime);
     if constexpr (Debug) {
       std::cout
           << "–––––––––––––––––––––Testing algorithm––––––––––––––––––––––"
@@ -626,7 +627,7 @@ template <bool Debug, typename P> void eigen(const nlohmann::json &json) {
   float step = json.value("step", (float)step_default);
   float step_growth = json.value("step-growth", step_growth_default);
 
-  auto benchmark = [&](uint16_t size) -> std::tuple<uint64_t, bool> {
+  auto benchmark = [&](uint16_t size) -> std::tuple<Time, bool> {
     GenericMatrix<P> A(size, size);
     A.setRandom();
 
@@ -639,7 +640,7 @@ template <bool Debug, typename P> void eigen(const nlohmann::json &json) {
     if (eigensolver.info() != Eigen::Success) {
       // stop clock
       absolute_time_t stopTime = get_absolute_time();
-      uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
+      Time time_us = absolute_time_diff_us(startTime, stopTime);
 
       if constexpr (Debug) {
         std::cout
@@ -663,7 +664,7 @@ template <bool Debug, typename P> void eigen(const nlohmann::json &json) {
 
     // stop clock
     absolute_time_t stopTime = get_absolute_time();
-    uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
+    Time time_us = absolute_time_diff_us(startTime, stopTime);
 
     // prevent optimization (hopefully)
     volatile P sinkVal = values(random_range_32(0, size));
@@ -716,7 +717,7 @@ template <bool Debug, typename P> void rank(const nlohmann::json &json) {
 
   float dim_ratio = json.value("max-dim-ratio", dim_ratio_default);
 
-  auto benchmark = [&](uint16_t x, uint16_t y) -> uint64_t {
+  auto benchmark = [&](uint16_t x, uint16_t y) -> Time {
     GenericMatrix<P> A(x, y);
     A.setRandom();
 
@@ -729,7 +730,7 @@ template <bool Debug, typename P> void rank(const nlohmann::json &json) {
 
     // stop clock
     absolute_time_t stopTime = get_absolute_time();
-    uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
+    Time time_us = absolute_time_diff_us(startTime, stopTime);
 
     // prevent optimization (hopefully)
     (void)rank;
@@ -782,7 +783,7 @@ template <bool Debug, typename P> void llt(const nlohmann::json &json) {
   float step_growth = json.value("step-growth", step_growth_default);
 
   // returns tuple{time, decomposition, solved}
-  auto benchmark = [&](uint16_t size) -> std::tuple<uint64_t, bool, bool> {
+  auto benchmark = [&](uint16_t size) -> std::tuple<Time, bool, bool> {
     GenericMatrix<P> A(size, size);
     A.setRandom();
     // A must be SPD matrix
@@ -800,7 +801,7 @@ template <bool Debug, typename P> void llt(const nlohmann::json &json) {
     if (solver.info() != Eigen::Success) {
       // decomposition failed
       absolute_time_t stopTime = get_absolute_time();
-      uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
+      Time time_us = absolute_time_diff_us(startTime, stopTime);
 
       if constexpr (Debug) {
         std::cout
@@ -823,7 +824,7 @@ template <bool Debug, typename P> void llt(const nlohmann::json &json) {
     if (solver.info() != Eigen::Success) {
       // solving failed
       absolute_time_t stopTime = get_absolute_time();
-      uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
+      Time time_us = absolute_time_diff_us(startTime, stopTime);
 
       if constexpr (Debug) {
         std::cout
@@ -845,7 +846,7 @@ template <bool Debug, typename P> void llt(const nlohmann::json &json) {
 
     // stop clock
     absolute_time_t stopTime = get_absolute_time();
-    uint64_t time_us = absolute_time_diff_us(startTime, stopTime);
+    Time time_us = absolute_time_diff_us(startTime, stopTime);
 
     // prevent optimization (hopefully)
     volatile P sink = res(random_range_32(0, size));
