@@ -43,19 +43,12 @@ uint32_t random_range_32(uint32_t low, uint32_t high) {
 }
 
 template <bool Debug, typename P> void inverse(const nlohmann::json &json) {
-<<<<<<< HEAD
-  uint16_t min = json.value("min-dimension", Defaults::min);
-  uint16_t max = json.value("max-dimension", Defaults::max);
-  auto step = (float)json.value("step", Defaults::step);
-  float step_growth = json.value("step-growth", Defaults::step_growth);
-=======
   auto params = json["params"];
 
   uint16_t min = params.value("min-dimension", Defaults::min);
   uint16_t max = params.value("max-dimension", Defaults::max);
   auto step = (float)params.value("step", Defaults::step);
   float step_growth = params.value("step-growth", Defaults::step_growth);
->>>>>>> new-protocol
 
   auto benchmark = [&](uint16_t size) -> Time {
     GenericMatrix<P> source(size, size);
@@ -112,17 +105,10 @@ template <bool Debug, typename P> void inverse(const nlohmann::json &json) {
 template <bool Debug, typename P> void determinant(const nlohmann::json &json) {
   auto params = json["params"];
 
-<<<<<<< HEAD
-  uint32_t min = json.value("min-dimension", Defaults::min);
-  uint32_t max = json.value("max-dimension", Defaults::max);
-  auto step = (float)json.value("step", Defaults::step);
-  float step_growth = json.value("step-growth", Defaults::step_growth);
-=======
   uint32_t min = params.value("min-dimension", Defaults::min);
   uint32_t max = params.value("max-dimension", Defaults::max);
   auto step = (float)params.value("step", Defaults::step);
   float step_growth = params.value("step-growth", Defaults::step_growth);
->>>>>>> new-protocol
 
   auto benchmark = [&](uint16_t size) -> Time {
     GenericMatrix<P> source(size, size);
@@ -180,16 +166,6 @@ template <bool Debug, typename P> void determinant(const nlohmann::json &json) {
 template <bool Debug, typename P> void lu(const nlohmann::json &json) {
   auto params = json["params"];
 
-<<<<<<< HEAD
-  uint16_t min = json.value("min-dimension", Defaults::min);
-  uint16_t max = json.value("max-dimension", Defaults::max);
-  auto step = (float)json.value("step", Defaults::step);
-  float step_growth = json.value("step-growth", Defaults::step_growth);
-  auto sub_step = (float)json.value("sub-step", step);
-  float sub_step_growth = json.value("sub-step-growth", step_growth);
-
-  float dim_ratio = json.value("max-dim-ratio", Defaults::dim_ratio);
-=======
   uint16_t min = params.value("min-dimension", Defaults::min);
   uint16_t max = params.value("max-dimension", Defaults::max);
   auto step = (float)params.value("step", Defaults::step);
@@ -198,7 +174,6 @@ template <bool Debug, typename P> void lu(const nlohmann::json &json) {
   float sub_step_growth = params.value("sub-step-growth", step_growth);
 
   float dim_ratio = params.value("max-dim-ratio", Defaults::dim_ratio);
->>>>>>> new-protocol
 
   auto benchmark = [&](uint16_t x, uint16_t y) -> Time {
     GenericMatrix<P> source(x, y);
@@ -277,16 +252,6 @@ template <bool Debug, typename P> void lu(const nlohmann::json &json) {
 template <bool Debug, typename P> void qr(const nlohmann::json &json) {
   auto params = json["params"];
 
-<<<<<<< HEAD
-  uint16_t min = json.value("min-dimension", Defaults::min);
-  uint16_t max = json.value("max-dimension", Defaults::max);
-  float step = json.value("step", (float)Defaults::step);
-  float step_growth = json.value("step-growth", Defaults::step_growth);
-  float sub_step = json.value("sub-step", step);
-  float sub_step_growth = json.value("sub-step-growth", step_growth);
-
-  float dim_ratio = json.value("max-dim-ratio", Defaults::dim_ratio);
-=======
   uint16_t min = params.value("min-dimension", Defaults::min);
   uint16_t max = params.value("max-dimension", Defaults::max);
   float step = params.value("step", (float)Defaults::step);
@@ -295,7 +260,6 @@ template <bool Debug, typename P> void qr(const nlohmann::json &json) {
   float sub_step_growth = params.value("sub-step-growth", step_growth);
 
   float dim_ratio = params.value("max-dim-ratio", Defaults::dim_ratio);
->>>>>>> new-protocol
 
   auto benchmark = [&](uint16_t x, uint16_t y) -> Time {
     GenericMatrix<P> source(x, y);
@@ -388,16 +352,6 @@ template <bool Debug, typename P> void qr(const nlohmann::json &json) {
 template <bool Debug, typename P> void matmul(const nlohmann::json &json) {
   auto params = json["params"];
 
-<<<<<<< HEAD
-  uint16_t min = json.value("min-dimension", Defaults::min);
-  uint16_t max = json.value("max-dimension", Defaults::max);
-  float step = json.value("step", (float)Defaults::step);
-  float step_growth = json.value("step-growth", Defaults::step_growth);
-  float sub_step = json.value("sub-step", step);
-  float sub_step_growth = json.value("sub-step-growth", step_growth);
-
-  float dim_ratio = json.value("max-dim-ratio", Defaults::dim_ratio);
-=======
   uint16_t min = params.value("min-dimension", Defaults::min);
   uint16_t max = params.value("max-dimension", Defaults::max);
   float step = params.value("step", (float)Defaults::step);
@@ -406,7 +360,6 @@ template <bool Debug, typename P> void matmul(const nlohmann::json &json) {
   float sub_step_growth = params.value("sub-step-growth", step_growth);
 
   float dim_ratio = params.value("max-dim-ratio", Defaults::dim_ratio);
->>>>>>> new-protocol
 
   auto benchmark = [&](uint16_t x, uint16_t y, uint16_t z) -> Time {
     // allocate matrices
@@ -483,17 +436,10 @@ template <bool Debug, typename P> void matmul(const nlohmann::json &json) {
 template <bool Debug, typename P> void heap_alloc(const nlohmann::json &json) {
   auto params = json["params"];
 
-<<<<<<< HEAD
-  uint16_t min = json.value("min-dimension", Defaults::min);
-  uint16_t max = json.value("max-dimension", Defaults::max);
-  float step = json.value("step", (float)Defaults::step);
-  float step_growth = json.value("step-growth", Defaults::step_growth);
-=======
   uint16_t min = params.value("min-dimension", Defaults::min);
   uint16_t max = params.value("max-dimension", Defaults::max);
   float step = params.value("step", (float)Defaults::step);
   float step_growth = params.value("step-growth", Defaults::step_growth);
->>>>>>> new-protocol
 
   auto benchmark = [&](uint16_t size) -> Time {
     // start clock
@@ -524,13 +470,8 @@ template <bool Debug, typename P> void heap_alloc(const nlohmann::json &json) {
 }
 
 template <bool Debug, typename P> void stack_alloc(const nlohmann::json &json) {
-<<<<<<< HEAD
-  uint16_t iterations = json.value("iterations", Defaults::iterations);
-=======
   auto params = json["params"];
-
   uint16_t iterations = params.value("iterations", Defaults::iterations);
->>>>>>> new-protocol
 
   auto benchmark = [&]() -> Time {
     // start clock
@@ -566,16 +507,6 @@ template <bool Debug, typename P> void stack_alloc(const nlohmann::json &json) {
 template <bool Debug, typename P> void copy(const nlohmann::json &json) {
   auto params = json["params"];
 
-<<<<<<< HEAD
-  uint16_t min = json.value("min-dimension", Defaults::min);
-  uint16_t max = json.value("max-dimension", Defaults::max);
-  float step = json.value("step", (float)Defaults::step);
-  float step_growth = json.value("step-growth", Defaults::step_growth);
-  float sub_step = json.value("sub-step", step);
-  float sub_step_growth = json.value("sub-step-growth", step_growth);
-
-  float dim_ratio = json.value("max-dim-ratio", Defaults::dim_ratio);
-=======
   uint16_t min = params.value("min-dimension", Defaults::min);
   uint16_t max = params.value("max-dimension", Defaults::max);
   float step = params.value("step", (float)Defaults::step);
@@ -584,7 +515,6 @@ template <bool Debug, typename P> void copy(const nlohmann::json &json) {
   float sub_step_growth = params.value("sub-step-growth", step_growth);
 
   float dim_ratio = params.value("max-dim-ratio", Defaults::dim_ratio);
->>>>>>> new-protocol
 
   auto benchmark = [&](uint16_t x, uint16_t y) -> Time {
     GenericMatrix<P> source(x, y);
@@ -645,11 +575,7 @@ template <uint32_t N, typename F> constexpr void repeat(F &&f) {
 template <bool Debug, typename P> void read_flash(const nlohmann::json &json) {
   auto params = json["params"];
 
-<<<<<<< HEAD
-  uint16_t iterations = json.value("iterations", Defaults::iterations);
-=======
   uint16_t iterations = params.value("iterations", Defaults::iterations);
->>>>>>> new-protocol
 
   auto benchmark = [&]<uint16_t X, uint16_t Y>() -> Time {
     // start clock
@@ -703,19 +629,11 @@ template <bool Debug, typename P> void read_flash(const nlohmann::json &json) {
 template <bool Debug, typename P> void eigen(const nlohmann::json &json) {
   auto params = json["params"];
 
-<<<<<<< HEAD
-  uint16_t min = json.value("min-dimension", Defaults::min);
-  uint16_t max = json.value("max-dimension", Defaults::max);
-
-  float step = json.value("step", (float)Defaults::step);
-  float step_growth = json.value("step-growth", Defaults::step_growth);
-=======
   uint16_t min = params.value("min-dimension", Defaults::min);
   uint16_t max = params.value("max-dimension", Defaults::max);
 
   float step = params.value("step", (float)Defaults::step);
   float step_growth = params.value("step-growth", Defaults::step_growth);
->>>>>>> new-protocol
 
   auto benchmark = [&](uint16_t size) -> std::tuple<Time, bool> {
     GenericMatrix<P> A(size, size);
@@ -798,16 +716,7 @@ template <bool Debug, typename P> void eigen(const nlohmann::json &json) {
 }
 
 template <bool Debug, typename P> void rank(const nlohmann::json &json) {
-<<<<<<< HEAD
-  uint16_t min = json.value("min-dimension", Defaults::min);
-  uint16_t max = json.value("max-dimension", Defaults::max);
-  float step = json.value("step", (float)Defaults::step);
-  float step_growth = json.value("step-growth", Defaults::step_growth);
-  float sub_step = json.value("sub-step", step);
-  float sub_step_growth = json.value("sub-step-growth", step_growth);
 
-  float dim_ratio = json.value("max-dim-ratio", Defaults::dim_ratio);
-=======
   auto params = json["params"];
 
   uint16_t min = params.value("min-dimension", Defaults::min);
@@ -818,7 +727,6 @@ template <bool Debug, typename P> void rank(const nlohmann::json &json) {
   float sub_step_growth = params.value("sub-step-growth", step_growth);
 
   float dim_ratio = params.value("max-dim-ratio", Defaults::dim_ratio);
->>>>>>> new-protocol
 
   auto benchmark = [&](uint16_t x, uint16_t y) -> Time {
     GenericMatrix<P> A(x, y);
