@@ -73,7 +73,6 @@ void core1_main() {
 }
 #endif
 
-// 153DAE50CB3F2B4D
 int main() {
   stdio_init_all();
 
