@@ -41,6 +41,10 @@ using Time = int64_t;
 uint32_t random_range_32(uint32_t low, uint32_t high) {
   return low + (get_rand_32() % (high - low));
 }
+template <typename P> P random_float() {
+  const uint32_t max_int = (uint32_t)0 - (uint32_t)1;
+  return (P)get_rand_32() * (1.0 / (P)max_int);
+}
 
 template <bool Debug, typename P> void inverse(const nlohmann::json &json) {
   auto params = json["params"];
@@ -581,12 +585,19 @@ template <bool Debug, typename P> void read_flash(const nlohmann::json &json) {
     // start clock
     absolute_time_t startTime = get_absolute_time();
     // perform calculation
-    const Eigen::Map<const GenericMatrix<P>> R(data<P, X, Y>.data(), X, Y);
+    // map uses pointer as reference.
+    // creating a new matrix from it copies data to heap
+    GenericMatrix<P> copy =
+        Eigen::Map<const GenericMatrix<P>>(data<P, X, Y>.data(), X, Y);
+
     // stop clock
     absolute_time_t stopTime = get_absolute_time();
 
     // prevent optimization (hopefully)
-    volatile P sink = R(random_range_32(0, X), random_range_32(0, Y));
+    copy(random_range_32(0, X), random_range_32(0, Y)) =
+        random_float<P>() *
+        10.0; //  multiply with 10 so it stands out in debug print
+    volatile P sink = copy(random_range_32(0, X), random_range_32(0, Y));
     (void)sink;
 
     Time time_us = absolute_time_diff_us(startTime, stopTime);
@@ -595,7 +606,7 @@ template <bool Debug, typename P> void read_flash(const nlohmann::json &json) {
           << "–––––––––––––––––––––Testing algorithm––––––––––––––––––––––"
           << std::endl;
 
-      std::cout << "R = " << std::endl << R << std::endl;
+      std::cout << "R = " << std::endl << copy << std::endl;
       std::cout << "Time µs = " << time_us << std::endl;
 
       std::cout
@@ -716,7 +727,6 @@ template <bool Debug, typename P> void eigen(const nlohmann::json &json) {
 }
 
 template <bool Debug, typename P> void rank(const nlohmann::json &json) {
-
   auto params = json["params"];
 
   uint16_t min = params.value("min-dimension", Defaults::min);
@@ -762,6 +772,7 @@ template <bool Debug, typename P> void rank(const nlohmann::json &json) {
 
     return time_us;
   };
+
   if constexpr (Debug) {
     for (uint32_t i = 0; i < DEBUG_BENCHMARK_COUNT; i++) {
       benchmark(
