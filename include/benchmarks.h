@@ -12,6 +12,7 @@
 #include <nlohmann/json.hpp>
 
 #include "const_rand.h"
+#include "rand.h"
 
 namespace Defaults {
 constexpr const char *benchmark = "invalid";
@@ -40,14 +41,6 @@ using GenericMatrix = Eigen::Matrix<P, Eigen::Dynamic, Eigen::Dynamic>;
 template <typename P> using GenericVector = Eigen::Vector<P, Eigen::Dynamic>;
 using Time = int64_t;
 
-uint32_t random_range_32(uint32_t low, uint32_t high) {
-  return low + (get_rand_32() % (high - low));
-}
-template <typename P> P random_float() {
-  const uint32_t max_int = (uint32_t)0 - (uint32_t)1;
-  return (P)get_rand_32() * (1.0 / (P)max_int);
-}
-
 template <bool Debug, typename P> void inverse(const nlohmann::json &json) {
   auto params = json["params"];
 
@@ -70,8 +63,8 @@ template <bool Debug, typename P> void inverse(const nlohmann::json &json) {
     absolute_time_t stopTime = get_absolute_time();
 
     // prevents optimization
-    volatile P sink =
-        result(random_range_32(0, size), random_range_32(0, size));
+    volatile P sink = result(random_int_range<uint16_t>(0, size),
+                             random_int_range<uint16_t>(0, size));
     (void)sink;
 
     Time time_us = absolute_time_diff_us(startTime, stopTime);
@@ -95,8 +88,8 @@ template <bool Debug, typename P> void inverse(const nlohmann::json &json) {
   };
   if constexpr (Debug) {
     for (uint32_t i = 0; i < DEBUG_BENCHMARK_COUNT; i++) {
-      benchmark(
-          random_range_32(DEBUG_BENCHMARK_MIN_DIM, DEBUG_BENCHMARK_MAX_DIM));
+      benchmark(random_int_range<uint16_t>(DEBUG_BENCHMARK_MIN_DIM,
+                                           DEBUG_BENCHMARK_MAX_DIM));
     }
     return;
   }
@@ -130,8 +123,8 @@ template <bool Debug, typename P> void determinant(const nlohmann::json &json) {
     absolute_time_t stopTime = get_absolute_time();
 
     // prevent optimization (hopefully)
-    volatile P sink =
-        source(random_range_32(0, size), random_range_32(0, size));
+    volatile P sink = source(random_int_range<uint16_t>(0, size),
+                             random_int_range<uint16_t>(0, size));
     (void)sink;
     (void)res;
 
@@ -156,8 +149,8 @@ template <bool Debug, typename P> void determinant(const nlohmann::json &json) {
   };
   if constexpr (Debug) {
     for (uint32_t i = 0; i < DEBUG_BENCHMARK_COUNT; i++) {
-      benchmark(
-          random_range_32(DEBUG_BENCHMARK_MIN_DIM, DEBUG_BENCHMARK_MAX_DIM));
+      benchmark(random_int_range<uint16_t>(DEBUG_BENCHMARK_MIN_DIM,
+                                           DEBUG_BENCHMARK_MAX_DIM));
     }
     return;
   }
@@ -201,9 +194,11 @@ template <bool Debug, typename P> void lu(const nlohmann::json &json) {
     absolute_time_t stopTime = get_absolute_time();
 
     // prevent optimization (hopefully)
-    volatile P sinkU = U(random_range_32(0, x), random_range_32(0, y));
+    volatile P sinkU =
+        U(random_int_range<uint16_t>(0, x), random_int_range<uint16_t>(0, y));
     (void)sinkU;
-    volatile P sinkL = L(random_range_32(0, x), random_range_32(0, x));
+    volatile P sinkL =
+        L(random_int_range<uint16_t>(0, x), random_int_range<uint16_t>(0, x));
     (void)sinkL;
 
     Time time_us = absolute_time_diff_us(startTime, stopTime);
@@ -237,9 +232,10 @@ template <bool Debug, typename P> void lu(const nlohmann::json &json) {
 
   if constexpr (Debug) {
     for (uint32_t i = 0; i < DEBUG_BENCHMARK_COUNT; i++) {
-      benchmark(
-          random_range_32(DEBUG_BENCHMARK_MIN_DIM, DEBUG_BENCHMARK_MAX_DIM),
-          random_range_32(DEBUG_BENCHMARK_MIN_DIM, DEBUG_BENCHMARK_MAX_DIM));
+      benchmark(random_int_range<uint16_t>(DEBUG_BENCHMARK_MIN_DIM,
+                                           DEBUG_BENCHMARK_MAX_DIM),
+                random_int_range<uint16_t>(DEBUG_BENCHMARK_MIN_DIM,
+                                           DEBUG_BENCHMARK_MAX_DIM));
     }
     return;
   }
@@ -287,7 +283,8 @@ template <bool Debug, typename P> void qr(const nlohmann::json &json) {
     absolute_time_t stopTime = get_absolute_time();
 
     // prevent optimization (hopefully)
-    volatile P sink = R(random_range_32(0, y), random_range_32(0, y));
+    volatile P sink =
+        R(random_int_range<uint16_t>(0, y), random_int_range<uint16_t>(0, y));
     (void)sink;
 
     Time time_us = absolute_time_diff_us(startTime, stopTime);
@@ -323,9 +320,10 @@ template <bool Debug, typename P> void qr(const nlohmann::json &json) {
 
   if constexpr (Debug) {
     for (uint32_t i = 0; i < DEBUG_BENCHMARK_COUNT; i++) {
-      benchmark(
-          random_range_32(DEBUG_BENCHMARK_MIN_DIM, DEBUG_BENCHMARK_MAX_DIM),
-          random_range_32(DEBUG_BENCHMARK_MIN_DIM, DEBUG_BENCHMARK_MAX_DIM));
+      benchmark(random_int_range<uint16_t>(DEBUG_BENCHMARK_MIN_DIM,
+                                           DEBUG_BENCHMARK_MAX_DIM),
+                random_int_range<uint16_t>(DEBUG_BENCHMARK_MIN_DIM,
+                                           DEBUG_BENCHMARK_MAX_DIM));
     }
     return;
   }
@@ -386,7 +384,8 @@ template <bool Debug, typename P> void matmul(const nlohmann::json &json) {
     absolute_time_t stopTime = get_absolute_time();
 
     // prevent optimization (hopefully)
-    volatile P sink = R(random_range_32(0, x), random_range_32(0, z));
+    volatile P sink =
+        R(random_int_range<uint16_t>(0, x), random_int_range<uint16_t>(0, z));
     (void)sink;
 
     Time time_us = absolute_time_diff_us(startTime, stopTime);
@@ -412,10 +411,12 @@ template <bool Debug, typename P> void matmul(const nlohmann::json &json) {
   };
   if constexpr (Debug) {
     for (uint32_t i = 0; i < DEBUG_BENCHMARK_COUNT; i++) {
-      benchmark(
-          random_range_32(DEBUG_BENCHMARK_MIN_DIM, DEBUG_BENCHMARK_MAX_DIM),
-          random_range_32(DEBUG_BENCHMARK_MIN_DIM, DEBUG_BENCHMARK_MAX_DIM),
-          random_range_32(DEBUG_BENCHMARK_MIN_DIM, DEBUG_BENCHMARK_MAX_DIM));
+      benchmark(random_int_range<uint16_t>(DEBUG_BENCHMARK_MIN_DIM,
+                                           DEBUG_BENCHMARK_MAX_DIM),
+                random_int_range<uint16_t>(DEBUG_BENCHMARK_MIN_DIM,
+                                           DEBUG_BENCHMARK_MAX_DIM),
+                random_int_range<uint16_t>(DEBUG_BENCHMARK_MIN_DIM,
+                                           DEBUG_BENCHMARK_MAX_DIM));
     }
     return;
   }
@@ -460,8 +461,8 @@ template <bool Debug, typename P> void heap_alloc(const nlohmann::json &json) {
 
     // prevent optimization (hopefully)
     source.setRandom();
-    volatile P sink =
-        source(random_range_32(0, size), random_range_32(0, size));
+    volatile P sink = source(random_int_range<uint16_t>(0, size),
+                             random_int_range<uint16_t>(0, size));
     (void)sink;
 
     return absolute_time_diff_us(startTime, stopTime);
@@ -492,8 +493,9 @@ template <bool Debug, typename P> void stack_alloc(const nlohmann::json &json) {
 
     // prevent optimization (hopefully)
     A.setRandom();
-    volatile P sink = A(random_range_32(0, Defaults::Dimension::max),
-                        random_range_32(0, Defaults::Dimension::max));
+    volatile P sink =
+        A(random_int_range<uint16_t>(0, Defaults::Dimension::max),
+          random_int_range<uint16_t>(0, Defaults::Dimension::max));
     (void)sink;
 
     return absolute_time_diff_us(startTime, stopTime);
@@ -539,7 +541,8 @@ template <bool Debug, typename P> void copy(const nlohmann::json &json) {
     absolute_time_t stopTime = get_absolute_time();
 
     // prevent optimization (hopefully)
-    volatile P sink = copy(random_range_32(0, x), random_range_32(0, y));
+    volatile P sink = copy(random_int_range<uint16_t>(0, x),
+                           random_int_range<uint16_t>(0, y));
     (void)sink;
 
     return absolute_time_diff_us(startTime, stopTime);
@@ -600,10 +603,11 @@ template <bool Debug, typename P> void read_flash(const nlohmann::json &json) {
     absolute_time_t stopTime = get_absolute_time();
 
     // prevent optimization (hopefully)
-    copy(random_range_32(0, X), random_range_32(0, Y)) =
+    copy(random_int_range<uint16_t>(0, X), random_int_range<uint16_t>(0, Y)) =
         random_float<P>() *
         10.0; //  multiply with 10 so it stands out in debug print
-    volatile P sink = copy(random_range_32(0, X), random_range_32(0, Y));
+    volatile P sink = copy(random_int_range<uint16_t>(0, X),
+                           random_int_range<uint16_t>(0, Y));
     (void)sink;
 
     Time time_us = absolute_time_diff_us(startTime, stopTime);
@@ -692,10 +696,10 @@ template <bool Debug, typename P> void eigen(const nlohmann::json &json) {
     Time time_us = absolute_time_diff_us(startTime, stopTime);
 
     // prevent optimization (hopefully)
-    volatile P sinkVal = values(random_range_32(0, size));
+    volatile P sinkVal = values(random_int_range<uint16_t>(0, size));
     (void)sinkVal;
-    volatile P sinkVec =
-        vectors(random_range_32(0, size), random_range_32(0, size));
+    volatile P sinkVec = vectors(random_int_range<uint16_t>(0, size),
+                                 random_int_range<uint16_t>(0, size));
     (void)sinkVec;
 
     if constexpr (Debug) {
@@ -718,8 +722,8 @@ template <bool Debug, typename P> void eigen(const nlohmann::json &json) {
   };
   if constexpr (Debug) {
     for (uint32_t i = 0; i < DEBUG_BENCHMARK_COUNT; i++) {
-      benchmark(
-          random_range_32(DEBUG_BENCHMARK_MIN_DIM, DEBUG_BENCHMARK_MAX_DIM));
+      benchmark(random_int_range<uint16_t>(DEBUG_BENCHMARK_MIN_DIM,
+                                           DEBUG_BENCHMARK_MAX_DIM));
     }
     return;
   }
@@ -782,9 +786,10 @@ template <bool Debug, typename P> void rank(const nlohmann::json &json) {
 
   if constexpr (Debug) {
     for (uint32_t i = 0; i < DEBUG_BENCHMARK_COUNT; i++) {
-      benchmark(
-          random_range_32(DEBUG_BENCHMARK_MIN_DIM, DEBUG_BENCHMARK_MAX_DIM),
-          random_range_32(DEBUG_BENCHMARK_MIN_DIM, DEBUG_BENCHMARK_MAX_DIM));
+      benchmark(random_int_range<uint16_t>(DEBUG_BENCHMARK_MIN_DIM,
+                                           DEBUG_BENCHMARK_MAX_DIM),
+                random_int_range<uint16_t>(DEBUG_BENCHMARK_MIN_DIM,
+                                           DEBUG_BENCHMARK_MAX_DIM));
     }
     return;
   }
@@ -880,7 +885,7 @@ template <bool Debug, typename P> void llt(const nlohmann::json &json) {
     Time time_us = absolute_time_diff_us(startTime, stopTime);
 
     // prevent optimization (hopefully)
-    volatile P sink = res(random_range_32(0, size));
+    volatile P sink = res(random_int_range<uint16_t>(0, size));
     (void)sink;
 
     if constexpr (Debug) {
@@ -906,8 +911,8 @@ template <bool Debug, typename P> void llt(const nlohmann::json &json) {
   };
   if constexpr (Debug) {
     for (uint32_t i = 0; i < DEBUG_BENCHMARK_COUNT; i++) {
-      benchmark(
-          random_range_32(DEBUG_BENCHMARK_MIN_DIM, DEBUG_BENCHMARK_MAX_DIM));
+      benchmark(random_int_range<uint16_t>(DEBUG_BENCHMARK_MIN_DIM,
+                                           DEBUG_BENCHMARK_MAX_DIM));
     }
     return;
   }
