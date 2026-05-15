@@ -45,6 +45,8 @@ target_compile_options(pico-benchmark PRIVATE -Wno-psabi)
 #target_compile_definitions(pico-benchmark PRIVATE
 #    PICO_MALLOC_PANIC=0
 #)
+# enables try catch
+# add_compile_options(-fexceptions)
 
 target_include_directories(pico-benchmark PRIVATE include)
 # Add pico_stdlib library which aggregates commonly used features
