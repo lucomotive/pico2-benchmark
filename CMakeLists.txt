@@ -41,6 +41,10 @@ add_executable(pico-benchmark
 
 # needed for nlohmann-json package. otherwise compiler messages spam
 target_compile_options(pico-benchmark PRIVATE -Wno-psabi)
+# makes pico not crash when OOM
+#target_compile_definitions(pico-benchmark PRIVATE
+#    PICO_MALLOC_PANIC=0
+#)
 
 target_include_directories(pico-benchmark PRIVATE include)
 # Add pico_stdlib library which aggregates commonly used features
