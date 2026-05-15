@@ -2,6 +2,16 @@
   "benchmark": "read-flash",
   "params": {
     "precision": "double",
-    "iterations": 100
+    "dimension": {
+      "min": 5,
+      "max": 200,
+      "max-ratio": 0.1
+    },
+    "loop": {
+      "step": 2,
+      "step-growth": 0.1,
+      "substep": 2,
+      "substep-growth": 0.1
+    }
   }
 }

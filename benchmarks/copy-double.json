@@ -2,10 +2,14 @@
   "benchmark": "copy",
   "params": {
     "precision": "double",
-    "min-dimension": 5,
-    "max-dimension": 200,
+    "dimension": {
+      "min": 5,
+      "max": 200,
+      "max-ratio": 0.2
+    },
 
-    "step": 2,
-    "max-dim-ratio": 0.2
+    "loop": {
+      "step": 2
+    }
   }
 }

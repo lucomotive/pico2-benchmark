@@ -2,10 +2,13 @@
   "benchmark": "eigen-values",
   "params": {
     "precision": "float",
-    "min-dimension": 5,
-    "max-dimension": 500,
-
-    "step": 2,
-    "step-growth": 0.05
+    "dimension": {
+      "min": 5,
+      "max": 200
+    },
+    "loop": {
+      "step": 2,
+      "step-growth": 0.05
+    }
   }
 }

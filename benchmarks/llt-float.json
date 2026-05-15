@@ -1,6 +1,8 @@
 {
   "benchmark": "llt",
   "precision": "float",
-  "min-dimension": 5,
-  "max-dimension": 500
+  "dimension": {
+    "min": 5,
+    "max": 200
+  }
 }
