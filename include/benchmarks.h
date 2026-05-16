@@ -171,21 +171,19 @@ template <bool Debug, typename P> void determinant(const nlohmann::json &json) {
 }
 
 template <bool Debug, typename P> void lu(const nlohmann::json &json) {
-  auto params = json["params"];
+  auto params = json.at("params");
 
-  uint16_t min =
-      params.value("/dimension/min"_json_pointer, Defaults::Dimension::min);
-  uint16_t max =
-      params.value("/dimension/max"_json_pointer, Defaults::Dimension::max);
-  auto step =
-      (float)params.value("/loop/step"_json_pointer, Defaults::Loop::step);
-  float step_growth = params.value("/loop/step-growth"_json_pointer,
-                                   Defaults::Loop::step_growth);
-  auto sub_step = (float)params.value("/loop/substep"_json_pointer, step);
-  float sub_step_growth = params.value("/loop/substep-growth", step_growth);
+  auto dim = params.at("dimension");
+  auto loop = params.at("loop");
 
-  float dim_ratio = params.value("/dimension/max-ratio"_json_pointer,
-                                 Defaults::Dimension::max_ratio);
+  uint16_t min = dim.value("min", Defaults::Dimension::min);
+  uint16_t max = dim.value("max", Defaults::Dimension::max);
+  float dim_ratio = dim.value("max-ratio", Defaults::Dimension::max_ratio);
+
+  auto step = (float)loop.value("step", Defaults::Loop::step);
+  float step_growth = loop.value("step-growth", Defaults::Loop::step_growth);
+  auto sub_step = (float)loop.value("substep", step);
+  float sub_step_growth = loop.value("substep-growth", step_growth);
 
   auto benchmark = [&](uint16_t x, uint16_t y) -> Time {
     GenericMatrix<P> source(x, y);
@@ -244,10 +242,10 @@ template <bool Debug, typename P> void lu(const nlohmann::json &json) {
 
   if constexpr (Debug) {
     for (uint32_t i = 0; i < DEBUG_BENCHMARK_COUNT; i++) {
-      benchmark(random_int_range<uint16_t>(DEBUG_BENCHMARK_MIN_DIM,
-                                           DEBUG_BENCHMARK_MAX_DIM),
-                random_int_range<uint16_t>(DEBUG_BENCHMARK_MIN_DIM,
-                                           DEBUG_BENCHMARK_MAX_DIM));
+      // benchmark(random_int_range<uint16_t>(DEBUG_BENCHMARK_MIN_DIM,
+      //                                      DEBUG_BENCHMARK_MAX_DIM),
+      //           random_int_range<uint16_t>(DEBUG_BENCHMARK_MIN_DIM,
+      //                                      DEBUG_BENCHMARK_MAX_DIM));
     }
     return;
   }
@@ -556,7 +554,7 @@ template <bool Debug, typename P> void copy(const nlohmann::json &json) {
   float dim_ratio = params.value("/dimension/max-ratio"_json_pointer,
                                  Defaults::Dimension::max_ratio);
 
-  auto benchmark = [&](uint16_t x, uint16_t y) -> Time {
+  const auto benchmark = [&](uint16_t x, uint16_t y) -> Time {
     GenericMatrix<P> source(x, y);
     // random values
     source.setRandom();
@@ -576,7 +574,7 @@ template <bool Debug, typename P> void copy(const nlohmann::json &json) {
     return absolute_time_diff_us(startTime, stopTime);
   };
   if constexpr (Debug) {
-    printf("Nothing interesting to show");
+    printf("Nothing interesting to show\n");
     return;
   }
 
