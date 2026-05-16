@@ -14,11 +14,11 @@
 #define MULITCORE true
 
 void parse_command(const nlohmann::json &json) {
-  std::string name = json["benchmark"];
-  auto params = json["params"];
-  std::string precision = params.value("precision", Defaults::precision);
+  const std::string name = json["benchmark"];
+  const auto params = json["params"];
+  const std::string precision = params.value("precision", Defaults::precision);
 
-  auto benchmark = [&]<bool Debug, typename P>() {
+  const auto benchmark = [&]<bool Debug, typename P>() {
     if (name == "determinant" || name == "det")
       determinant<Debug, P>(json);
     if (name == "inverse")
@@ -45,7 +45,7 @@ void parse_command(const nlohmann::json &json) {
       llt<Debug, P>(json);
   };
 
-  auto run = [&]<typename P>() {
+  const auto run = [&]<typename P>() {
     printf("SOF test %s %s\n", name.c_str(), precision.c_str());
     benchmark.operator()<true, P>();
     printf("EOF test %s %s\n", name.c_str(), precision.c_str());
