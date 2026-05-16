@@ -15,4 +15,4 @@ if [ -z "$UF2" ]; then
 fi
 
 echo "Flashing $UF2..."
-picotool load "$UF2" --force --execute
+picotool load "$UF2" --force --execute --verify
