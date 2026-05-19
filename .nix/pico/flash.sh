@@ -7,7 +7,7 @@ PROJECT=$1
 
 # build process
 cmake -B "$TARGET/$BUILD_DIR" -S "$TARGET" -DCMAKE_BUILD_TYPE=Release
-cmake --build "$TARGET/$BUILD_DIR/$PROJECT" -j$(nproc) --target "$PROJECT"
+cmake --build "$TARGET/$BUILD_DIR" -j$(nproc) --target "$PROJECT"
 
 # find uf2 file
 UF2=$(ls "$TARGET/$BUILD_DIR/$PROJECT/"*.uf2 2>/dev/null | head -1)
@@ -22,4 +22,5 @@ picotool load "$UF2" --force --execute --verify
 sleep 3
 echo "Waiting for pico to start..."
 
-cat /dev/ttyACM0
+./run.sh TARGET PROJECT
+#cat /dev/ttyACM0 | tee "$TARGET/results/$PROJECT".csv
