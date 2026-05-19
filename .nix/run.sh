@@ -6,7 +6,7 @@ TARGET="pico"
 PROJECT=$1
 
 # build process
-cmake -B "$TARGET/$BUILD_DIR" -S "$TARGET"
+cmake -B "$TARGET/$BUILD_DIR" -S "$TARGET" -DCMAKE_BUILD_TYPE=Release
 cmake --build "$TARGET/$BUILD_DIR/$PROJECT" -j$(nproc) --target "$PROJECT"
 
 # find uf2 file
