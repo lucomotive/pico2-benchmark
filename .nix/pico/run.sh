@@ -1,8 +1,7 @@
 #!/bin/bash
 set -e
 
-TARGET="pico"
 PROJECT=$1
 PRECISION=$2
 
-cat /dev/ttyACM0 | tee "$TARGET/results/$PROJECT-$PRECISION".csv
+cat /dev/ttyACM0 | tee "results/$PROJECT-$PRECISION".csv

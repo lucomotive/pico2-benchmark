@@ -1,0 +1,18 @@
+#pragma once
+
+#include "utils.h"
+#include <Eigen/Householder>
+#include <timer.h>
+
+namespace benchmarks {
+namespace matmul {
+
+template <typename S>
+no_inline Time matmul(const Mat<S> &m1, const Mat<S> &m2, Mat<S> &res) {
+  Timer timer;
+  res.noalias() = m1 * m2;
+  return timer.elapsed();
+}
+
+}; // namespace matmul
+}; // namespace benchmarks

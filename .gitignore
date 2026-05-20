@@ -4,7 +4,5 @@ compile_commands.json
 .zed
 .clangd
 notes.md
-benchmarks/
 
-pico/build/
-pico/compile_commands.json
+build/
