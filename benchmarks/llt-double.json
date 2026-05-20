@@ -1,8 +1,0 @@
-{
-  "benchmark": "llt",
-  "precision": "double",
-  "dimension": {
-    "min": 5,
-    "max": 200
-  }
-}
