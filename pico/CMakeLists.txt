@@ -37,11 +37,21 @@ macro(add_pico_benchmark NAME)
         pico_time
         Eigen3::Eigen
     )
+    target_include_directories(${NAME} PRIVATE include)
     target_include_directories(${NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
     pico_enable_stdio_usb(${NAME} 1)
     pico_enable_stdio_uart(${NAME} 0)
     pico_add_extra_outputs(${NAME})
 endmacro()
 
-
+add_subdirectory(alloc-heap)
+add_subdirectory(alloc-stack)
+add_subdirectory(det)
+add_subdirectory(eigen-values)
+add_subdirectory(inverse)
+add_subdirectory(llt)
+add_subdirectory(lu)
+add_subdirectory(matmul)
 add_subdirectory(qr)
+add_subdirectory(rank)
+add_subdirectory(read-flash)
