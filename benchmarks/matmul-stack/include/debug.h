@@ -14,5 +14,5 @@ template <typename P, uint32_t x, uint32_t y, uint32_t z> void debug() {
   auto time = matmul::stack<P>(M1, M2, RES);
 
   print_all<'\n'>("M1:", M1.format(EIGEN_FMT), "M2:", M2.format(EIGEN_FMT),
-                  "RES:", RES.format(EIGEN_FMT), "TIME:", time.count());
+                  "RES:", RES.format(EIGEN_FMT), "TIME:", time);
 }

@@ -14,5 +14,12 @@ no_inline Time matmul(const Mat<S> &m1, const Mat<S> &m2, Mat<S> &res) {
   return timer.elapsed();
 }
 
+template <typename S, typename Mat1, typename Mat2, typename Res>
+no_inline Time stack(const Mat1 &m1, const Mat2 &m2, Res &res) {
+  Timer timer;
+  res.noalias() = m1 * m2;
+  return timer.elapsed();
+}
+
 }; // namespace matmul
 }; // namespace benchmarks

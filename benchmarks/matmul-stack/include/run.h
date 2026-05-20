@@ -12,12 +12,12 @@ template <typename P, uint32_t x, uint32_t y, uint32_t z> inline void op() {
   Matrix<P, y, z> M2(Matrix<P, y, z>::Random());
   Matrix<P, x, z> RES;
   auto time = matmul::stack<P>(M1, M2, RES);
-  printf("%u,%u,%u,%e\n", y, x, z, time.count());
+  printf("%u,%u,%u,%llu\n", y, x, z, time);
 };
 
 template <typename P> void run() {
   // run benchmark
-  printf("x,y,z,time_s\n");
+  printf("x,y,z,time_us\n");
   constexpr uint16_t min = 5;
   constexpr uint16_t max = 100;
   constexpr uint16_t step = 2;

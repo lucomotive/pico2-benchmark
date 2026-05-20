@@ -7,7 +7,7 @@
 #include <pico/types.h>
 
 #include "debug.h"
-#include "run.h"
+#include <run.h>
 
 using namespace benchmarks;
 
@@ -20,7 +20,7 @@ template <typename P> inline void bench_main() {
   }
 
   // display
-  debug<P, 4, 4, 4>();
+  debug<P, 4>();
   // run
   run<P>();
 
