@@ -3,7 +3,8 @@
 }:
 with pkgs;
 let
-  buildBenchmarks = writeShellScriptBin "build-common" (builtins.readFile ./common/build.sh);
+  benchBuildScript = writeShellScriptBin "build-bench" (builtins.readFile ./benchmarks/build.sh);
+
   hostBuildScript = writeShellScriptBin "build-host" (builtins.readFile ./host/build.sh);
 
   picoFlashScript = writeShellScriptBin "pico-flash" (builtins.readFile ./pico/flash.sh);
@@ -20,7 +21,7 @@ mkShell {
     nil
     nixd
 
-    buildBenchmarks
+    benchBuildScript
     hostBuildScript
     picoFlashScript
     picoRunScript
