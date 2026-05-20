@@ -11,9 +11,7 @@ project(pico-benchmark CXX C ASM)
 # initialize the Raspberry Pi Pico SDK
 pico_sdk_init()
 
-# invlude packages
-set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
-find_package(Eigen3 REQUIRED NO_MODULE)
+
 
 # compiler settings
 set(CMAKE_CXX_STANDARD 17)
@@ -26,6 +24,10 @@ execute_process(
         ${CMAKE_SOURCE_DIR}/compile_commands.json
 )
 
+# invlude packages
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
+find_package(Eigen3 REQUIRED NO_MODULE)
+
 
 macro(add_pico_benchmark NAME)
     add_executable(${NAME} ${ARGN})
@@ -35,7 +37,7 @@ macro(add_pico_benchmark NAME)
         pico_time
         Eigen3::Eigen
     )
-    #target_include_directories(${NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
+    target_include_directories(${NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
     pico_enable_stdio_usb(${NAME} 1)
     pico_enable_stdio_uart(${NAME} 0)
     pico_add_extra_outputs(${NAME})

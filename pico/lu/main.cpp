@@ -2,12 +2,9 @@
 #include "pico/time.h"
 
 #include <Eigen/QR>
-#include <Eigen/src/Core/IO.h>
 #include <Eigen/src/Core/util/Constants.h>
 #include <cstdio>
 #include <iostream>
-#include <ostream>
-#include <pico/stdio.h>
 #include <pico/types.h>
 
 #define no_inline __attribute__((noinline))
@@ -15,8 +12,8 @@
 using namespace Eigen;
 template <typename S> using Mat = Matrix<S, Dynamic, Dynamic>;
 
-template <typename S>
-no_inline uint64_t compute(HouseholderQR<Mat<S>> &qr, const Mat<S> &A) {
+template <typename QR>
+no_inline uint64_t compute(QR &qr, const typename QR::MatrixType &A) {
   auto start = get_absolute_time();
   qr.compute(A);
   auto stop = get_absolute_time();
@@ -45,17 +42,13 @@ inline result_t<S> householder_qr(uint32_t rows, uint32_t cols) {
 
 template <typename S> void print(const result_t<S> &result, bool verbose) {
   if (verbose) {
-    IOFormat fmt(FullPrecision, 0, ", ", "\n", "[", "]");
-
     std::cout << "––––––––––––––––– TESTING ALGORITHM –––––––––––––––––"
               << std::endl;
-    std::cout << "SOURCE = " << std::endl
-              << result.source.format(fmt) << std::endl;
-    std::cout << "Q = " << std::endl << result.Q.format(fmt) << std::endl;
-    std::cout << "R = " << std::endl << result.R.format(fmt) << std::endl;
+    std::cout << "SOURCE = " << std::endl << result.source << std::endl;
+    std::cout << "Q = " << std::endl << result.Q << std::endl;
+    std::cout << "R = " << std::endl << result.R << std::endl;
     auto approx = result.Q * result.R;
-    std::cout << "Q * R = " << std::endl
-              << (result.Q * result.R).format(fmt) << std::endl;
+    std::cout << "Q * R = " << std::endl << result.Q * result.R << std::endl;
     std::cout << "Error = " << (result.source - approx).norm() << std::endl;
     std::cout << "TIME = " << result.time << "µs" << std::endl;
     std::cout << "–––––––––––––––––––––––––––––––––––––––––––––––––––––"
@@ -76,15 +69,15 @@ int main() {
   }
 
   // display
-  auto householder_res = householder_qr<float>(4, 3);
-  print(householder_res, true);
+  auto result = householder_qr<float>(3, 3);
+  print(result, true);
 
   // run benchmark
   printf("x,y,time_us,error\n");
   const uint16_t min = 4;
-  const uint16_t max = 500;
-  const uint16_t step = 2;
-  const float max_ratio = 0.35;
+  const uint16_t max = 100;
+  const uint16_t step = 3;
+  const float max_ratio = 0.3;
   for (uint16_t x = min; x <= max; x += (int)step) {
     for (uint16_t y = min; y <= x; y += (int)step) {
       if ((float)y < (float)x * max_ratio)
@@ -97,6 +90,4 @@ int main() {
       }
     }
   }
-
-  stdio_deinit_all();
 }
