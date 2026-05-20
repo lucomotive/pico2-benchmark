@@ -20,7 +20,5 @@ echo "Flashing $UF2..."
 picotool load "$UF2" --force --execute --verify
 
 sleep 3
-echo "Waiting for pico to start..."
 
-./run.sh TARGET PROJECT
-#cat /dev/ttyACM0 | tee "$TARGET/results/$PROJECT".csv
+pico-run $PROJECT
