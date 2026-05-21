@@ -19,7 +19,7 @@ template <typename P> void run() {
   // run benchmark
   printf("rows,cols,time_us\n");
   const uint16_t min = 5;
-  const uint16_t max = 500;
+  const uint16_t max = 250;
   const uint16_t step = 2;
   const float max_ratio = 0.35;
   for (uint16_t x = min; x <= max; x += (int)step) {

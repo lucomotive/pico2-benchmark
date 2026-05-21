@@ -2,17 +2,17 @@
 
 #include "benchmarks/benchmarks.h"
 #include "print.h"
+#include "repeat.h"
 #include "timer.h"
-#include "utils.h"
 #include <cstdint>
 #include <cstdio>
 
 using namespace benchmarks;
 
-template <typename P, size_t SIZE> inline void op() {
+template <typename P, uint32_t SIZE> inline void op() {
   const Matrix<P, SIZE, SIZE> source(Matrix<P, SIZE, SIZE>::Random());
   auto [time, res] = det::stack<P>(source);
-  printf("%u,%llu\n", SIZE, time);
+  printf("%u,%lu\n", SIZE, time);
 };
 
 template <typename P> void run() {

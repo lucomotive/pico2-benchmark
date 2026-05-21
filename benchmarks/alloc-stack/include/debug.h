@@ -7,7 +7,7 @@
 
 using namespace benchmarks;
 
-template <uint32_t SIZE, typename P> void debug() {
+template <typename P, uint32_t SIZE> void debug() {
   Eigen::Matrix<P, SIZE, SIZE> res;
   auto time = alloc::stack<P, SIZE>(res);
 

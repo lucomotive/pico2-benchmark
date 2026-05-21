@@ -1,19 +1,17 @@
 #pragma once
 
 #include "benchmarks/benchmarks.h"
-#include "print.h"
-#include "timer.h"
-#include "utils.h"
+#include "repeat.h"
 #include <Eigen/Dense>
 #include <cstdint>
 #include <cstdio>
 
 using namespace benchmarks;
 
-template <uint32_t SIZE, typename P> inline void op() {
+template <typename P, uint32_t SIZE> inline void op() {
   Matrix<P, SIZE, SIZE> res;
   auto time = alloc::stack<P, SIZE>(res);
-  printf("%u,%llu\n", SIZE, time);
+  printf("%u,%lu\n", SIZE, time);
 };
 
 template <typename P> void run() {
@@ -29,5 +27,5 @@ template <typename P> void run() {
   constexpr uint16_t max = 300 / std::sqrt((P)sizeof(P));
   constexpr uint16_t step = 2;
 
-  repeat<max, step, min>([](auto i) { op<i, P>(); });
+  repeat<max, step, min>([](auto i) { op<P, i>(); });
 }

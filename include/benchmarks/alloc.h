@@ -10,34 +10,40 @@ namespace alloc {
 
 template <typename S> no_inline Time heap(Mat<S> &res, uint32_t size) {
   Timer timer;
-  res = Mat<S>(size);
-  return timer.elapsed();
+  res = Mat<S>(size, size);
+  return timer.elapsed_us();
 }
 
 template <typename S, uint32_t SIZE>
 no_inline Time stack(Matrix<S, SIZE, SIZE> &res) {
   Timer timer;
   res = Matrix<S, SIZE, SIZE>();
-  return timer.elapsed();
+  return timer.elapsed_us();
 }
 
+#if defined(BUILD_PICO)
 // initialize data in flash
 /* check if compiles to flash:
   arm-none-eabi-nm --size-sort --print-size \
   pico/build/read-flash/read-flash-float.elf | c++filt |  grep data\<
  */
-const uint16_t FLASH_DATA_SIZE = 100; // length doesnt matter
-// if matrix is bigger, it just reads other flash data. does not impact the
-// benchmark
-template <typename P>
-const std::array<P, FLASH_DATA_SIZE> read_flash_data =
-    const_rand::random_float_array<P, FLASH_DATA_SIZE>();
 
-template <typename S>
-no_inline Time from_flash(Mat<S> &res, uint32_t rows, uint32_t cols) {
+// on pico size doesnt matter. if matrix is bigger, it just reads other flash
+// data. does not impact the benchmark
+template <typename P, uint16_t SIZE>
+const std::array<P, 100> read_flash_data =
+    const_rand::random_float_array<P, 100>();
+#elif defined(BUILD_HOST)
+template <typename P, uint16_t SIZE>
+const std::array<P, SIZE> read_flash_data =
+    const_rand::random_float_array<P, SIZE>();
+#endif
+
+template <typename S, uint16_t SIZE> no_inline Time from_flash(Mat<S> &res) {
   Timer timer;
-  res = Eigen::Map<const Mat<S>>(read_flash_data<S>.data(), rows, cols);
-  return timer.elapsed();
+  res = Eigen::Map<const Mat<S>>(read_flash_data<S, SIZE * SIZE>.data(), SIZE,
+                                 SIZE);
+  return timer.elapsed_us();
 }
 
 }; // namespace alloc

@@ -10,8 +10,7 @@ template <typename S>
 no_inline Time inverse(Mat<S> &result, const Mat<S> &source) {
   Timer timer;
   result = source.inverse();
-  auto time = timer.elapsed();
-  return time;
+  return timer.elapsed_us();
 }
 
 }; // namespace inverse

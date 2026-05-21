@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.13)
 
 
 # host | pico | pico2
-set(TARGET_PLATFORM "pico")
+# set(TARGET_PLATFORM "pico")
 
 
 if((TARGET_PLATFORM STREQUAL "pico") OR (TARGET_PLATFORM STREQUAL "pico2"))
@@ -12,7 +12,7 @@ if((TARGET_PLATFORM STREQUAL "pico") OR (TARGET_PLATFORM STREQUAL "pico2"))
 endif()
 
 # init project
-project(pico-benchmark CXX C ASM)
+project(benchmarking CXX C ASM)
 
 if((TARGET_PLATFORM STREQUAL "pico") OR (TARGET_PLATFORM STREQUAL "pico2"))
   # initialize the Raspberry Pi Pico SDK
@@ -34,7 +34,7 @@ execute_process(
 
 
 # set flags for code
-if(TARGET_PLATFORM STREQUAL "pico")
+if((TARGET_PLATFORM STREQUAL "pico") OR (TARGET_PLATFORM STREQUAL "pico2"))
   add_compile_definitions(BUILD_PICO)
 elseif(TARGET_PLATFORM STREQUAL "host")
   add_compile_definitions(BUILD_HOST)
@@ -63,8 +63,10 @@ macro(add_benchmark NAME)
     target_link_libraries(${NAME} ${COMMON_LIBS})
   endif()
 
-  target_include_directories(${NAME} PRIVATE include)
-  target_include_directories(${NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  target_include_directories(${NAME} PRIVATE
+    include
+    ${CMAKE_SOURCE_DIR}/include
+  )
 
   if((TARGET_PLATFORM STREQUAL "pico") OR (TARGET_PLATFORM STREQUAL "pico2"))
     pico_enable_stdio_usb(${NAME} 1)

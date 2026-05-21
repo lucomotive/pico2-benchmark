@@ -7,9 +7,9 @@
 
 using namespace benchmarks;
 
-template <uint32_t SIZE, typename P> void debug(uint32_t rows, uint32_t cols) {
-  EigenSolver<Mat<P>> solver(rows, cols);
-  Mat<P> source(Mat<P>::Random(rows, cols));
+template <typename P> void debug(uint32_t size) {
+  EigenSolver<Mat<P>> solver;
+  Mat<P> source(Mat<P>::Random(size, size));
   auto time = eigen::eigen(solver, source);
 
   bool success = solver.info() == Success;

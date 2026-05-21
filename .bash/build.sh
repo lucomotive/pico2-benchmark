@@ -6,11 +6,13 @@ TARGET=$1
 PROJECT=$2
 PRECISION=$3
 
+echo "Building $PROJECT with $PRECISION for target $TARGET"
+
 # build process
 cmake -B "$BUILD_DIR" -S . -DCMAKE_BUILD_TYPE=Release -DTARGET_PLATFORM=${TARGET}
 cmake --build "$BUILD_DIR" -j$(nproc) --target "$PROJECT-$PRECISION"
 
-if [ $TARGET -eq "pico" || $TARGET -eq "pico2" ]; then
+if [[ $TARGET == "pico" || $TARGET == "pico2" ]]; then
     # find uf2 file
     UF2=$(ls "$BUILD_DIR/benchmarks/$PROJECT/$PROJECT-$PRECISION".uf2 2>/dev/null | head -1)
     if [ -z "$UF2" ]; then
@@ -25,4 +27,4 @@ if [ $TARGET -eq "pico" || $TARGET -eq "pico2" ]; then
     echo "Waiting for pico to start..."
 fi
 
-./.bash/run.sh $TARGET $PROJECT $PRECISION
+project-run $TARGET $PROJECT $PRECISION

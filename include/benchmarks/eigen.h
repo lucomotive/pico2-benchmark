@@ -13,8 +13,7 @@ template <typename S>
 no_inline Time eigen(EigenSolver<Mat<S>> &solver, const Mat<S> &A) {
   Timer timer;
   solver.compute(A);
-  auto time = timer.elapsed();
-  return time;
+  return timer.elapsed_us();
 }
 
 }; // namespace eigen

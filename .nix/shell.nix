@@ -24,7 +24,7 @@ mkShell {
     # Compiler and build tools
     gcc-arm-embedded
     cmake
-    #ninja
+    ninja
     python3 # Required by the SDK for scripts like pioasm
     # (python3.withPackages (
     #   python-pkgs: with python-pkgs; [

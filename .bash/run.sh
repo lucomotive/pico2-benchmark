@@ -1,12 +1,15 @@
 #!/bin/bash
 set -e
 
+BUILD_DIR="build"
 TARGET=$1
 PROJECT=$2
 PRECISION=$3
 
-if [ $TARGET -eq "pico" || $TARGET -eq "pico2" ]; then
+if [[ $TARGET == "pico" || $TARGET == "pico2" ]]; then
+    mkdir -p results/$TARGET
     cat /dev/ttyACM0 | tee "results/$TARGET/$PROJECT-$PRECISION".csv
-elif [ $TARGET -eq "host" ]; then
+elif [[ $TARGET == "host" ]]; then
+    mkdir -p results/$TARGET
     ./$BUILD_DIR/benchmarks/$PROJECT/$PROJECT-$PRECISION | tee "results/$TARGET/$PROJECT-$PRECISION".csv
 fi

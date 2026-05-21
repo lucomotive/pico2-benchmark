@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Eigen/Householder"
 #include "timer.h"
 #include "utils.h"
 
@@ -10,7 +11,7 @@ template <typename S>
 no_inline Time householder(HouseholderQR<Mat<S>> &qr, const Mat<S> &source) {
   Timer timer;
   qr.compute(source);
-  return timer.elapsed();
+  return timer.elapsed_us();
 }
 
 }; // namespace qr

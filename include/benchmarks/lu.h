@@ -11,7 +11,7 @@ template <typename S>
 no_inline Time full_piv(FullPivLU<Mat<S>> &lu, const Mat<S> &source) {
   Timer timer;
   lu.compute(source);
-  auto time = timer.elapsed();
+  auto time = timer.elapsed_us();
   return time;
 }
 

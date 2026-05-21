@@ -2,7 +2,6 @@
 
 #include "benchmarks/benchmarks.h"
 #include "print.h"
-#include "timer.h"
 #include <Eigen/Dense>
 
 using namespace benchmarks;
