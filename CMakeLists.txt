@@ -32,11 +32,21 @@ execute_process(
 )
 
 
-# include packages
+
+# set flags for code
+if(TARGET_PLATFORM STREQUAL "pico")
+  add_compile_definitions(BUILD_PICO)
+elseif(TARGET_PLATFORM STREQUAL "host")
+  add_compile_definitions(BUILD_HOST)
+endif()
+
+
+
+# find packages
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
 find_package(Eigen3 REQUIRED NO_MODULE)
 
-
+# include packages
 set(COMMON_LIBS
     Eigen3::Eigen
 )
@@ -45,7 +55,6 @@ set(PICO_LIBS
     pico_rand
     pico_time
 )
-
 macro(add_benchmark NAME)
   add_executable(${NAME} ${ARGN})
   if((TARGET_PLATFORM STREQUAL "pico") OR (TARGET_PLATFORM STREQUAL "pico2"))
