@@ -78,6 +78,8 @@ endmacro()
 
 add_subdirectory(benchmarks/alloc-heap)
 add_subdirectory(benchmarks/alloc-stack)
+add_subdirectory(benchmarks/copy-heap)
+add_subdirectory(benchmarks/copy-stack)
 add_subdirectory(benchmarks/det)
 add_subdirectory(benchmarks/det-stack)
 add_subdirectory(benchmarks/eigen-values)

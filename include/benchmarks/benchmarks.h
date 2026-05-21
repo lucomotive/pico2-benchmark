@@ -1,6 +1,7 @@
 #pragma once
 
 #include "alloc.h"
+#include "copy.h"
 #include "det.h"
 #include "eigen.h"
 #include "inverse.h"
