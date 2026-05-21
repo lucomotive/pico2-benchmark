@@ -4,8 +4,8 @@
 with pkgs;
 let
 
-  picoFlashScript = writeShellScriptBin "pico-flash" (builtins.readFile ./pico/flash.sh);
-  picoRunScript = writeShellScriptBin "pico-run" (builtins.readFile ./pico/run.sh);
+  buildScript = writeShellScriptBin "project-build" (builtins.readFile ../.bash/build.sh);
+  runScript = writeShellScriptBin "project-run" (builtins.readFile ../.bash/run.sh);
 
   my-pico-sdk = pkgs.pico-sdk.override {
     withSubmodules = true;
@@ -18,8 +18,8 @@ mkShell {
     nil
     nixd
 
-    picoFlashScript
-    picoRunScript
+    buildScript
+    runScript
 
     # Compiler and build tools
     gcc-arm-embedded

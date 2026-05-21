@@ -2,12 +2,12 @@
 set -e
 
 BUILD_DIR="build"
-TARGET="pico"
-PROJECT=$1
-PRECISION=$2
+TARGET=$1
+PROJECT=$2
+PRECISION=$3
 
 # build process
-cmake -B "$BUILD_DIR" -S . -DCMAKE_BUILD_TYPE=Release
+cmake -B "$BUILD_DIR" -S . -DCMAKE_BUILD_TYPE=Release -DTARGET_PLATFORM=${TARGET}
 cmake --build "$BUILD_DIR" -j$(nproc) --target "$PROJECT-$PRECISION"
 
 # find uf2 file
@@ -23,4 +23,4 @@ picotool load "$UF2" --force --execute --verify
 sleep 3
 echo "Waiting for pico to start..."
 
-pico-run $PROJECT $PRECISION
+./.bash/run.sh $TARGET $PROJECT $PRECISION

@@ -1,16 +1,23 @@
 cmake_minimum_required(VERSION 3.13)
 
 
-# use pico sdk
-set(PICO_BOARD pico2)
-include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
+# host | pico | pico2
+set(TARGET_PLATFORM "pico")
+
+
+if((TARGET_PLATFORM STREQUAL "pico") OR (TARGET_PLATFORM STREQUAL "pico2"))
+  # use pico sdk
+  set(PICO_BOARD ${TARGET_PLATFORM})
+  include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
+endif()
 
 # init project
 project(pico-benchmark CXX C ASM)
 
-# initialize the Raspberry Pi Pico SDK
-pico_sdk_init()
-
+if((TARGET_PLATFORM STREQUAL "pico") OR (TARGET_PLATFORM STREQUAL "pico2"))
+  # initialize the Raspberry Pi Pico SDK
+  pico_sdk_init()
+endif()
 
 
 # compiler settings
@@ -30,19 +37,32 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
 find_package(Eigen3 REQUIRED NO_MODULE)
 
 
-macro(add_pico_benchmark NAME)
-    add_executable(${NAME} ${ARGN})
-    target_link_libraries(${NAME}
-        pico_stdlib
-        pico_rand
-        pico_time
-        Eigen3::Eigen
-    )
-    target_include_directories(${NAME} PRIVATE include)
-    target_include_directories(${NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
+set(COMMON_LIBS
+    Eigen3::Eigen
+)
+set(PICO_LIBS
+    pico_stdlib
+    pico_rand
+    pico_time
+)
+
+macro(add_benchmark NAME)
+  add_executable(${NAME} ${ARGN})
+  if((TARGET_PLATFORM STREQUAL "pico") OR (TARGET_PLATFORM STREQUAL "pico2"))
+    target_link_libraries(${NAME} ${COMMON_LIBS} ${PICO_LIBS})
+  elseif(TARGET_PLATFORM STREQUAL "host")
+    target_link_libraries(${NAME} ${COMMON_LIBS})
+  endif()
+
+  target_include_directories(${NAME} PRIVATE include)
+  target_include_directories(${NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
+
+  if((TARGET_PLATFORM STREQUAL "pico") OR (TARGET_PLATFORM STREQUAL "pico2"))
     pico_enable_stdio_usb(${NAME} 1)
     pico_enable_stdio_uart(${NAME} 0)
     pico_add_extra_outputs(${NAME})
+  endif()
+
 endmacro()
 
 add_subdirectory(benchmarks/alloc-heap)
