@@ -12,15 +12,13 @@
 #include "ps_ram.h"
 
 #if defined(ENABLE_PSRAM)
-// void *operator new(size_t size) {
-//   void *ptr = malloc(size);
-//   if (ptr)
-//     return ptr;
-//   ptr = psram::ps_malloc(size);
-//   if (ptr)
-//     return ptr;
-//   throw std::bad_alloc();
-// }
+void *operator new(size_t size) {
+  void *ptr = malloc(size);
+  if (ptr)
+    return ptr;
+  return psram::ps_malloc(size);
+  throw std::bad_alloc();
+}
 
 void *operator new(size_t size, std::nothrow_t) noexcept {
   void *ptr = malloc(size);

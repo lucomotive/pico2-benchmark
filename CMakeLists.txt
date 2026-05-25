@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 
+
 if((TARGET_PLATFORM STREQUAL "pico2") OR (TARGET_PLATFORM STREQUAL "pico2-psram"))
   # use pico sdk
   set(PICO_BOARD pico2)
@@ -12,8 +13,17 @@ elseif(TARGET_PLATFORM STREQUAL "pico")
   include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 endif()
 
+
 # init project
 project(benchmarking CXX C ASM)
+
+if(TARGET_PLATFORM STREQUAL "pico2-psram")
+  add_compile_definitions(PICO_CXX_DISABLE_ALLOCATION_OVERRIDES=1)
+  #add_compile_options(-fexceptions)
+  set(PICO_CXX_ENABLE_EXCEPTIONS 1)
+
+  set(PICO_MALLOC_PANIC=0)
+endif()
 
 if((TARGET_PLATFORM STREQUAL "pico") OR (TARGET_PLATFORM STREQUAL "pico2") OR (TARGET_PLATFORM STREQUAL "pico2-psram"))
   # initialize the Raspberry Pi Pico SDK

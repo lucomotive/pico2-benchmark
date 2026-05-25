@@ -3,6 +3,7 @@
 #include "hardware/regs/xip.h"
 #include "hardware/structs/xip.h"
 #include "pico/stdlib.h"
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 
@@ -17,7 +18,7 @@ void init(uint32_t pin) {
   xip_ctrl_hw->ctrl |= XIP_CTRL_WRITABLE_M1_BITS;
 }
 
-struct Block {
+struct alignas(8) Block {
   size_t space;
   Block *next;
   bool free;
@@ -29,7 +30,14 @@ void init_heap() {
   entry->free = true;
 }
 
+inline size_t align_up(size_t size) { return (size + 7) & ~7; }
+
 void *ps_malloc(size_t size) {
+  if (size == 0)
+    return nullptr;
+
+  size = align_up(size);
+
   Block *block = entry;
   while (block != nullptr) {
     if (!block->free || block->space < size) {
@@ -40,9 +48,9 @@ void *ps_malloc(size_t size) {
     // pointer where memory region begins
     auto *ptr = (uint8_t *)block + sizeof(Block);
 
-    // space can hold size and another block with at least 1 byte
+    // space can hold size and another block with at least 8 byte
     // block can be inserted
-    if (block->space >= (size + sizeof(Block) + 1)) {
+    if (block->space >= (size + sizeof(Block) + 8)) {
       auto *next_block = (Block *)(ptr + size);
 
       next_block->next = block->next;
@@ -62,6 +70,9 @@ void *ps_malloc(size_t size) {
 }
 
 void ps_free(void *ptr) {
+  if (ptr == nullptr)
+    return;
+
   Block *prev = nullptr;
   Block *block = entry;
   while (block != nullptr) {
@@ -76,15 +87,15 @@ void ps_free(void *ptr) {
     block->free = true;
     if (block->next != nullptr && block->next->free) {
       // join with next block
-      block->space += block->next->space + sizeof(Block);
+      block->space = block->space + block->next->space + sizeof(Block);
       block->next = block->next->next;
     }
     if (prev != nullptr && prev->free) {
       // join with previous
-      prev->space += block->space + sizeof(Block);
+      prev->space = prev->space + block->space + sizeof(Block);
       prev->next = block->next;
     }
-    break;
+    return;
   }
 }
 
@@ -93,7 +104,7 @@ bool is_psram(void *ptr) {
   return addr >= BASE_ADDRESS && addr < BASE_ADDRESS + SIZE;
 }
 
-void probe(bool show_data) {
+void probe(bool show_data, size_t max_values = 64) {
   Block *block = entry;
   while (block != nullptr) {
     printf("Block %p: data: %p, size: %d, free: %u, next: %p\n", block,
@@ -103,11 +114,14 @@ void probe(bool show_data) {
       auto *data = (uint8_t *)block + sizeof(Block);
 
       printf("bytes: ");
-      for (size_t i = 0; i < block->space; i++) {
+      for (size_t i = 0; i < std::min(max_values, block->space); i++) {
         printf("%u", data[i]);
         if (i != block->space - 1)
           printf(",");
       }
+      if (block->space > max_values)
+        printf("...");
+
       printf("\n");
     }
 

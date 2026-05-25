@@ -29,12 +29,9 @@ int main() {
 
   using DATA_T = uint8_t;
 
-  const size_t a_size = 5;
+  const size_t a_size = 16;
   const size_t b_size = 3;
-  const size_t c_size = 7;
-
-  const size_t d_size = 7;
-  const size_t e_size = 1;
+  const size_t c_size = 9;
 
   printf("ALLOCATING ––––––––––\n");
   auto [a, time_a] = allocate<DATA_T>(a_size);
@@ -63,6 +60,8 @@ int main() {
   psram::probe(true);
   printf("–––––––––––––––––––––\n");
 
+  const size_t d_size = 8;
+  const size_t e_size = 1;
   printf("ALLOCATING ––––––––––\n");
   auto [d, time_d] = allocate<DATA_T>(d_size);
   std::fill(d, d + d_size, 4);
@@ -74,6 +73,38 @@ int main() {
 
   printf("PROBING –––––––––––––\n");
   psram::probe(true);
+  printf("–––––––––––––––––––––\n");
+
+  printf("DEALLOCATING ––––––––\n");
+  psram::ps_free(c);
+  psram::ps_free(d);
+  psram::ps_free(e);
+  printf("–––––––––––––––––––––\n");
+
+  printf("PROBING –––––––––––––\n");
+  psram::probe(true);
+  printf("–––––––––––––––––––––\n");
+
+  printf("ALLOCATE HUGE –––––––\n");
+  const size_t f_size = 1024 * 1024 * 2;
+  auto [f, time_f] = allocate<DATA_T>(f_size);
+  std::fill(f, f + f_size, 12);
+  printf("Ptr: %p, took: %llu µs\n", f, time_f);
+
+  const size_t g_size = 1024 * 1024 * 3;
+  auto [g, time_g] = allocate<DATA_T>(g_size);
+  std::fill(g, g + g_size, 7);
+  printf("Ptr: %p, took: %llu µs\n", g, time_g);
+
+  const size_t h_size = 1024 * 1024 * 6;
+  auto [h, time_h] = allocate<DATA_T>(h_size);
+  if (h)
+    std::fill(h, h + h_size, 9);
+  printf("Ptr: %p, took: %llu µs\n", h, time_h);
+  printf("–––––––––––––––––––––\n");
+
+  printf("PROBING –––––––––––––\n");
+  psram::probe(true, 128);
   printf("–––––––––––––––––––––\n");
 
   sleep_ms(500);
