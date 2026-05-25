@@ -7,7 +7,6 @@
 #include "pico/stdio.h"
 #include "pico/stdio_usb.h"
 #include "pico/time.h"
-#include "pico/types.h"
 #endif
 
 int main() {
@@ -22,6 +21,8 @@ int main() {
 
   // display
   debug<double>(4);
+  debug<double>(5);
+
   // run
   run<double>();
 

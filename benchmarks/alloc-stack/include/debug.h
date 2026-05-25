@@ -8,8 +8,6 @@
 using namespace benchmarks;
 
 template <typename P, uint32_t SIZE> void debug() {
-  Eigen::Matrix<P, SIZE, SIZE> res;
-  auto time = alloc::stack<P, SIZE>(res);
-
-  print_all<'\n'>("SOURCE:", res.format(EIGEN_FMT), "TIME:", time);
+  auto [mat, time] = alloc::stack<P, SIZE>();
+  print_all<'\n'>("MATRIX:", mat.format(EIGEN_FMT), "TIME:", time);
 }

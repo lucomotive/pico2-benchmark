@@ -22,6 +22,8 @@ int main() {
 
   // display
   debug<float>(4);
+  debug<float>(5);
+
   // run
   run<float>();
 

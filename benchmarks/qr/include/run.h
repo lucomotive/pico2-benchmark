@@ -6,13 +6,22 @@
 #include <cstdint>
 #include <cstdio>
 
+#include <ps_ram.h>
+
 using namespace benchmarks;
 
 template <typename P> inline void op(uint32_t rows, uint32_t cols) {
-  const Mat<P> source(Mat<P>::Random(rows, cols));
+#if defined(ENABLE_PSRAM)
+  auto *cache = (uint8_t *)psram::BASE_ADDRESS;
+  Map<Mat<P>> source((P *)cache, rows, cols);
+#else
+  Mat<P> source(rows, cols);
+#endif
+  source.setRandom();
+
   HouseholderQR<Mat<P>> qr(rows, cols);
   auto time = qr::householder(qr, source);
-  printf("%u,%u,%lu\n", rows, cols, time);
+  printf("%u,%u,%llu\n", rows, cols, time);
 };
 
 template <typename P> void run() {

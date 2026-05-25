@@ -12,7 +12,7 @@ template <typename P> inline void op(uint32_t size) {
   const Mat<P> source(Mat<P>::Random(size, size));
   Mat<P> res;
   auto time = copy::heap<P>(res, source);
-  printf("%u,%lu\n", size, time);
+  printf("%u,%llu\n", size, time);
 };
 
 template <typename P> void run() {

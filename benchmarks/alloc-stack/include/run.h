@@ -8,10 +8,9 @@
 
 using namespace benchmarks;
 
-template <typename P, uint32_t SIZE> inline void op() {
-  Matrix<P, SIZE, SIZE> res;
-  auto time = alloc::stack<P, SIZE>(res);
-  printf("%u,%lu\n", SIZE, time);
+template <typename P, uint16_t SIZE> inline void op() {
+  auto [mat, time] = alloc::stack<P, SIZE>();
+  printf("%u,%llu\n", SIZE, time);
 };
 
 template <typename P> void run() {

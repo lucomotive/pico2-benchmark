@@ -11,7 +11,7 @@ using namespace benchmarks;
 template <typename P> inline void op(uint32_t size) {
   const Mat<P> source(Mat<P>::Random(size, size));
   auto [time, res] = det::determinant(source);
-  printf("%u,%lu\n", size, time);
+  printf("%u,%llu\n", size, time);
 };
 
 template <typename P> void run() {

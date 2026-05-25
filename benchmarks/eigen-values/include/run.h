@@ -16,7 +16,7 @@ template <typename P> inline void op(uint32_t size) {
   const Mat<P> source(Mat<P>::Random(size, size));
   auto time = eigen::eigen(solver, source);
   bool success = solver.info() == Success;
-  printf("%u,%lu,%u\n", size, time, success);
+  printf("%u,%llu,%u\n", size, time, success);
 };
 
 template <typename P> void run() {

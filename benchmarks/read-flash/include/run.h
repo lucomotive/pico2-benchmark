@@ -7,10 +7,9 @@
 
 using namespace benchmarks;
 
-template <typename P, uint16_t SIZE> inline void op() {
-  Mat<P> res;
-  auto time = alloc::from_flash<P, SIZE>(res);
-  printf("%u,%llu\n", SIZE, time);
+template <typename P> inline void op(uint16_t size) {
+  auto [res, time] = alloc::from_flash_heap<P>(size);
+  printf("%u,%llu\n", size, time);
 };
 
 template <typename P> void run() {
@@ -20,5 +19,6 @@ template <typename P> void run() {
   const uint16_t max = 100;
   const uint16_t step = 2;
 
-  repeat<max, step, min>([](const auto i) { op<P, i>(); });
+  for (uint16_t i = min; i < max; i += step)
+    op<P>(i);
 }

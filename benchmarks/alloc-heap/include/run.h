@@ -9,9 +9,8 @@
 using namespace benchmarks;
 
 template <typename P> inline void op(uint32_t size) {
-  Mat<P> res;
-  auto time = alloc::heap(res, size);
-  printf("%u,%lu\n", size, time);
+  auto [mat, time] = alloc::heap<P>(size);
+  printf("%u,%llu\n", size, time);
 };
 
 template <typename P> void run() {

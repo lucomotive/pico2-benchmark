@@ -1,20 +1,21 @@
 cmake_minimum_required(VERSION 3.13)
 
 
-# host | pico | pico2
-# set(TARGET_PLATFORM "pico")
-
-
-if((TARGET_PLATFORM STREQUAL "pico") OR (TARGET_PLATFORM STREQUAL "pico2"))
+if((TARGET_PLATFORM STREQUAL "pico2") OR (TARGET_PLATFORM STREQUAL "pico2-psram"))
   # use pico sdk
-  set(PICO_BOARD ${TARGET_PLATFORM})
+  set(PICO_BOARD pico2)
+  set(PICO_PLATFORM rp2350)
+  include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
+elseif(TARGET_PLATFORM STREQUAL "pico")
+  set(PICO_BOARD pico)
+  set(PICO_PLATFORM rp2040)
   include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 endif()
 
 # init project
 project(benchmarking CXX C ASM)
 
-if((TARGET_PLATFORM STREQUAL "pico") OR (TARGET_PLATFORM STREQUAL "pico2"))
+if((TARGET_PLATFORM STREQUAL "pico") OR (TARGET_PLATFORM STREQUAL "pico2") OR (TARGET_PLATFORM STREQUAL "pico2-psram"))
   # initialize the Raspberry Pi Pico SDK
   pico_sdk_init()
 endif()
@@ -34,10 +35,14 @@ execute_process(
 
 
 # set flags for code
-if((TARGET_PLATFORM STREQUAL "pico") OR (TARGET_PLATFORM STREQUAL "pico2"))
+if((TARGET_PLATFORM STREQUAL "pico") OR (TARGET_PLATFORM STREQUAL "pico2") OR (TARGET_PLATFORM STREQUAL "pico2-psram"))
   add_compile_definitions(BUILD_PICO)
 elseif(TARGET_PLATFORM STREQUAL "host")
   add_compile_definitions(BUILD_HOST)
+endif()
+
+if(TARGET_PLATFORM STREQUAL "pico2-psram")
+  add_compile_definitions(ENABLE_PSRAM)
 endif()
 
 
@@ -57,7 +62,7 @@ set(PICO_LIBS
 )
 macro(add_benchmark NAME)
   add_executable(${NAME} ${ARGN})
-  if((TARGET_PLATFORM STREQUAL "pico") OR (TARGET_PLATFORM STREQUAL "pico2"))
+  if((TARGET_PLATFORM STREQUAL "pico") OR (TARGET_PLATFORM STREQUAL "pico2") OR (TARGET_PLATFORM STREQUAL "pico2-psram"))
     target_link_libraries(${NAME} ${COMMON_LIBS} ${PICO_LIBS})
   elseif(TARGET_PLATFORM STREQUAL "host")
     target_link_libraries(${NAME} ${COMMON_LIBS})
@@ -68,7 +73,7 @@ macro(add_benchmark NAME)
     ${CMAKE_SOURCE_DIR}/include
   )
 
-  if((TARGET_PLATFORM STREQUAL "pico") OR (TARGET_PLATFORM STREQUAL "pico2"))
+  if((TARGET_PLATFORM STREQUAL "pico") OR (TARGET_PLATFORM STREQUAL "pico2") OR (TARGET_PLATFORM STREQUAL "pico2-psram"))
     pico_enable_stdio_usb(${NAME} 1)
     pico_enable_stdio_uart(${NAME} 0)
     pico_add_extra_outputs(${NAME})
@@ -76,6 +81,7 @@ macro(add_benchmark NAME)
 
 endmacro()
 
+add_subdirectory(benchmarks/accuracy)
 add_subdirectory(benchmarks/alloc-heap)
 add_subdirectory(benchmarks/alloc-stack)
 add_subdirectory(benchmarks/copy-heap)
@@ -88,6 +94,9 @@ add_subdirectory(benchmarks/llt)
 add_subdirectory(benchmarks/lu)
 add_subdirectory(benchmarks/matmul)
 add_subdirectory(benchmarks/matmul-stack)
+add_subdirectory(benchmarks/psram)
+add_subdirectory(benchmarks/psram-allocator)
 add_subdirectory(benchmarks/qr)
 add_subdirectory(benchmarks/rank)
 add_subdirectory(benchmarks/read-flash)
+add_subdirectory(benchmarks/read-flash-stack)

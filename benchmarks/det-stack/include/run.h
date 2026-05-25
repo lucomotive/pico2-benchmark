@@ -12,7 +12,7 @@ using namespace benchmarks;
 template <typename P, uint32_t SIZE> inline void op() {
   const Matrix<P, SIZE, SIZE> source(Matrix<P, SIZE, SIZE>::Random());
   auto [time, res] = det::stack<P>(source);
-  printf("%u,%lu\n", SIZE, time);
+  printf("%u,%llu\n", SIZE, time);
 };
 
 template <typename P> void run() {

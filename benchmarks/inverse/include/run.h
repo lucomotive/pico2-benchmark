@@ -13,7 +13,7 @@ template <typename P> inline void op(uint32_t size) {
   Mat<P> res;
   auto time = inverse::inverse(res, source);
 
-  printf("%u,%lu\n", size, time);
+  printf("%u,%llu\n", size, time);
 };
 
 template <typename P> void run() {

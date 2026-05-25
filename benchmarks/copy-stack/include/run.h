@@ -12,7 +12,7 @@ template <typename P, uint32_t SIZE> inline void op() {
   const Matrix<P, SIZE, SIZE> source(Matrix<P, SIZE, SIZE>::Random(SIZE, SIZE));
   Matrix<P, SIZE, SIZE> res;
   auto time = copy::stack<P, SIZE>(res, source);
-  printf("%u,%lu\n", SIZE, time);
+  printf("%u,%llu\n", SIZE, time);
 };
 
 template <typename P> void run() {

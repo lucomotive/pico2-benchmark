@@ -7,8 +7,8 @@
 namespace benchmarks {
 namespace qr {
 
-template <typename S>
-no_inline Time householder(HouseholderQR<Mat<S>> &qr, const Mat<S> &source) {
+template <typename Solver, typename Mat>
+no_inline Time householder(Solver &qr, const Mat &source) {
   Timer timer;
   qr.compute(source);
   return timer.elapsed_us();
