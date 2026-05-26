@@ -8,6 +8,7 @@
 
 namespace benchmarks {
 namespace alloc {
+using namespace my_timer;
 
 template <typename S> no_inline std::tuple<Mat<S>, Time> heap(uint16_t size) {
   Timer timer;

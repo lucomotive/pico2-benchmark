@@ -6,6 +6,7 @@
 
 namespace benchmarks {
 namespace matmul {
+using namespace my_timer;
 
 // template <typename S>
 // no_inline Time matmul(const Mat<S> &m1, const Mat<S> &m2, Mat<S> &res) {

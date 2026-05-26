@@ -5,9 +5,9 @@
 
 namespace benchmarks {
 namespace inverse {
+using namespace my_timer;
 
-template <typename S>
-no_inline Time inverse(Mat<S> &result, const Mat<S> &source) {
+template <typename Mat> no_inline Time inverse(Mat &result, const Mat &source) {
   Timer timer;
   result = source.inverse();
   return timer.elapsed_us();

@@ -9,36 +9,9 @@
 #include "pico/stdio_usb.h"
 #include "pico/time.h"
 #endif
-#include "ps_ram.h"
 
 #if defined(ENABLE_PSRAM)
-void *operator new(size_t size) {
-  void *ptr = malloc(size);
-  if (ptr)
-    return ptr;
-  return psram::ps_malloc(size);
-  throw std::bad_alloc();
-}
-
-void *operator new(size_t size, std::nothrow_t) noexcept {
-  void *ptr = malloc(size);
-  if (ptr)
-    return ptr;
-  return psram::ps_malloc(size);
-}
-
-void operator delete(void *ptr) noexcept {
-  if (!ptr)
-    return;
-  if (psram::is_psram(ptr))
-    psram::ps_free(ptr);
-  else
-    free(ptr);
-}
-
-void *operator new[](size_t size) { return ::operator new(size); }
-
-void operator delete[](void *ptr) noexcept { ::operator delete(ptr); }
+#include "psram.h"
 #endif
 
 template <typename P> void banch_main() {
@@ -53,8 +26,7 @@ template <typename P> void banch_main() {
 
 #if defined(ENABLE_PSRAM)
   const static size_t PSRAM_CS_PIN = 8;
-  psram::init(PSRAM_CS_PIN);
-  psram::init_heap();
+  psram_setup(PSRAM_CS_PIN);
 #endif
 
   // display

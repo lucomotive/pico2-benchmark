@@ -10,7 +10,9 @@
 #include "pico/time.h"
 #endif
 
-#include "ps_ram.h"
+#if defined(ENABLE_PSRAM)
+#include "psram.h"
+#endif
 
 template <typename P> void bench_main() {
 #if defined(BUILD_PICO)
@@ -24,7 +26,7 @@ template <typename P> void bench_main() {
 
 #if defined(ENABLE_PSRAM)
   const static size_t PSRAM_CS_PIN = 8;
-  psram::init(PSRAM_CS_PIN);
+  psram_setup(PSRAM_CS_PIN);
 #endif
 
   // display

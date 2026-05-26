@@ -5,8 +5,10 @@
 
 namespace benchmarks {
 namespace llt {
+using namespace my_timer;
 
-template <typename S> no_inline Time llt(LLT<Mat<S>> &solver, const Mat<S> &A) {
+template <typename Solver, typename Mat>
+no_inline Time llt(Solver &solver, const Mat &A) {
   Timer timer;
   solver.compute(A);
   return timer.elapsed_us();

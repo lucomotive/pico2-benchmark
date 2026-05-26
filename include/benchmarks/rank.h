@@ -5,9 +5,10 @@
 
 namespace benchmarks {
 namespace rank {
+using namespace my_timer;
 
-template <typename S>
-no_inline std::tuple<Time, int> rank(const FullPivLU<Mat<S>> &lu) {
+template <typename Solver>
+no_inline std::tuple<Time, int> rank(const Solver &lu) {
   Timer timer;
   auto rank = lu.rank();
   return {timer.elapsed_us(), rank};

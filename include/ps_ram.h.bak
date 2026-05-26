@@ -1,7 +1,11 @@
 #pragma once
 
-#include "hardware/regs/xip.h"
-#include "hardware/structs/xip.h"
+#include "hardware/clocks.h"
+#include "hardware/gpio.h"
+#include "hardware/structs/ioqspi.h"
+#include "hardware/structs/xip_ctrl.h"
+#include "hardware/sync.h"
+
 #include "pico/stdlib.h"
 #include <algorithm>
 #include <cstdio>
@@ -12,6 +16,15 @@ namespace psram {
 const static size_t BASE_ADDRESS = 0x11'000'000;
 const static size_t BASE_ADDRESS_UNCACHED = 0x15'000'000;
 const static size_t SIZE = (8 * 1024 * 1024);
+
+struct psram_id_t {
+  uint8_t mfid;   /* Manufacturer ID */
+  uint8_t kgd;    /* Known Good Die */
+  uint8_t eid[6]; /* EID */
+};
+
+static size_t psram_sz = 0;
+static psram_id_t psram_id = {0};
 
 void init(uint32_t pin) {
   gpio_set_function(pin, GPIO_FUNC_XIP_CS1);

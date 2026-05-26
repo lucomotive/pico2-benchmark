@@ -8,9 +8,10 @@
 
 namespace benchmarks {
 namespace eigen {
+using namespace my_timer;
 
-template <typename S>
-no_inline Time eigen(EigenSolver<Mat<S>> &solver, const Mat<S> &A) {
+template <typename Solver, typename Mat>
+no_inline Time eigen(Solver &solver, const Mat &A) {
   Timer timer;
   solver.compute(A);
   return timer.elapsed_us();

@@ -3,13 +3,16 @@
 #include "benchmarks/benchmarks.h"
 #include "print.h"
 #include <Eigen/Householder>
-#include <ps_ram.h>
+
+#if defined(ENABLE_PSRAM)
+#include "psram.h"
+#endif
 
 using namespace benchmarks;
 
 template <typename P> void debug(uint32_t rows, uint32_t cols) {
 #if defined(ENABLE_PSRAM)
-  auto *cache = (uint8_t *)psram::BASE_ADDRESS;
+  auto *cache = (uint8_t *)PSRAM_BASE;
   Map<Mat<P>> source((P *)cache, rows, cols);
 #else
   Mat<P> source(rows, cols);

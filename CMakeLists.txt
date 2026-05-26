@@ -17,13 +17,8 @@ endif()
 # init project
 project(benchmarking CXX C ASM)
 
-if(TARGET_PLATFORM STREQUAL "pico2-psram")
-  add_compile_definitions(PICO_CXX_DISABLE_ALLOCATION_OVERRIDES=1)
-  #add_compile_options(-fexceptions)
-  set(PICO_CXX_ENABLE_EXCEPTIONS 1)
-
-  set(PICO_MALLOC_PANIC=0)
-endif()
+# add_compile_definitions(PICO_CXX_DISABLE_ALLOCATION_OVERRIDES=1)
+# set(PICO_CXX_ENABLE_EXCEPTIONS 1)
 
 if((TARGET_PLATFORM STREQUAL "pico") OR (TARGET_PLATFORM STREQUAL "pico2") OR (TARGET_PLATFORM STREQUAL "pico2-psram"))
   # initialize the Raspberry Pi Pico SDK
@@ -69,6 +64,9 @@ set(PICO_LIBS
     pico_stdlib
     pico_rand
     pico_time
+
+    psram
+    timer
 )
 macro(add_benchmark NAME)
   add_executable(${NAME} ${ARGN})
@@ -90,6 +88,9 @@ macro(add_benchmark NAME)
   endif()
 
 endmacro()
+
+add_subdirectory(shared/psram)
+add_subdirectory(shared/timer)
 
 add_subdirectory(benchmarks/accuracy)
 add_subdirectory(benchmarks/alloc-heap)

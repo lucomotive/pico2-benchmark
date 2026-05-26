@@ -1,16 +1,26 @@
 #pragma once
 
 #include "benchmarks/benchmarks.h"
-#include "print.h"
-#include "timer.h"
 #include <cstdint>
 #include <cstdio>
+
+#if defined(ENABLE_PSRAM)
+#include "psram.h"
+#endif
 
 using namespace benchmarks;
 
 template <typename P> inline void op(uint32_t size) {
-  const Mat<P> source(Mat<P>::Random(size, size));
-  auto [time, res] = det::determinant(source);
+#if defined(ENABLE_PSRAM)
+  auto *s_cache = (uint8_t *)PSRAM_BASE;
+  Map<Mat<P>> source((P *)s_cache, size, size);
+#else
+  Mat<P> source(size, size);
+#endif
+  source.setRandom();
+
+  auto [time, res] = det::determinant<P>(source);
+
   printf("%u,%llu\n", size, time);
 };
 

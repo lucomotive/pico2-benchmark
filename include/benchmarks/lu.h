@@ -6,13 +6,13 @@
 
 namespace benchmarks {
 namespace lu {
+using namespace my_timer;
 
-template <typename S>
-no_inline Time full_piv(FullPivLU<Mat<S>> &lu, const Mat<S> &source) {
+template <typename Solver, typename Mat>
+no_inline Time full_piv(Solver &lu, const Mat &source) {
   Timer timer;
   lu.compute(source);
-  auto time = timer.elapsed_us();
-  return time;
+  return timer.elapsed_us();
 }
 
 }; // namespace lu
