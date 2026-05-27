@@ -56,8 +56,5 @@ mkShell {
     echo "🍓 Raspberry Pi Pico SDK environment 🍓"
     echo "======================================="
     echo "PICO_SDK_PATH is set to: $PICO_SDK_PATH"
-
-    echo "Build project with 'pico-build <project>'"
-    echo "Flash project with 'sudo pico-flash <project>'"
   '';
 }

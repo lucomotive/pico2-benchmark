@@ -8,11 +8,12 @@
 
 using namespace benchmarks;
 
-template <typename P, uint32_t SIZE> inline void op() {
-  const Matrix<P, SIZE, SIZE> source(Matrix<P, SIZE, SIZE>::Random(SIZE, SIZE));
-  Matrix<P, SIZE, SIZE> res;
-  auto time = copy::stack<P, SIZE>(res, source);
-  printf("%u,%llu\n", SIZE, time);
+template <typename P, uint32_t size> void op() {
+  Matrix<P, size, size> source;
+  source.setRandom();
+  Matrix<P, size, size> res;
+  auto time = copy::copy(res, source);
+  printf("%u,%llu\n", size, time);
 };
 
 template <typename P> void run() {
@@ -22,5 +23,5 @@ template <typename P> void run() {
   constexpr uint16_t max = 100;
   constexpr uint16_t step = 2;
 
-  repeat<max, step, min>([](auto i) { op<P, i>(); });
+  repeat<max, step, min>([](const auto i) { op<P, i>(); });
 }

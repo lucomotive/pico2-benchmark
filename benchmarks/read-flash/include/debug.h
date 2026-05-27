@@ -10,5 +10,9 @@ using namespace benchmarks;
 template <typename P> void debug(uint16_t size) {
   auto [res, time] = alloc::from_flash_heap<P>(size);
 
-  print_all<'\n'>("RESULT:", res.format(EIGEN_FMT), "TIME:", time);
+  printf("RESULT:\n");
+  print_float_matrix(res);
+  printf("TIME: %llu\n", time);
+
+  // print_all<'\n'>("RESULT:", res.format(EIGEN_FMT), "TIME:", time);
 }

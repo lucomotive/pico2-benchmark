@@ -1,8 +1,6 @@
 
-#include "debug.h"
-#include "run.h"
-
 #include <cstdio>
+
 #if defined(BUILD_PICO)
 #include "pico/stdio.h"
 #include "pico/stdio_usb.h"
@@ -13,7 +11,7 @@
 #include "psram.h"
 #endif
 
-template <typename P> void banch_main() {
+void setup() {
 #if defined(BUILD_PICO)
   stdio_init_all();
 
@@ -27,11 +25,4 @@ template <typename P> void banch_main() {
   const static size_t PSRAM_CS_PIN = 8;
   psram_setup(PSRAM_CS_PIN);
 #endif
-
-  // display
-  debug<P>(4, 4);
-  // run
-  run<P>();
-
-  printf("EOF\n");
 }

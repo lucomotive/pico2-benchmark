@@ -27,13 +27,15 @@ template <typename P> inline void op(uint32_t size) {
   printf("%u,%llu,%u\n", size, time, success);
 };
 
+template <typename P> void loop(uint16_t min, uint16_t max, uint16_t step) {
+  for (uint16_t x = min; x <= max; x += (int)step)
+    op<P>(x);
+}
+
 template <typename P> void run() {
   // run benchmark
   printf("rows/cols,time_us,computable\n");
-  const uint16_t min = 5;
-  const uint16_t max = 250;
-  const uint16_t step = 2;
-
-  for (uint16_t x = min; x <= max; x += (int)step)
-    op<P>(x);
+  loop<P>(5, 50, 2);
+  loop<P>(50, 100, 3);
+  loop<P>(100, 500, 5);
 }

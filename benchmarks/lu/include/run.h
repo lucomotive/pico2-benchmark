@@ -26,13 +26,8 @@ template <typename P> inline void op(uint32_t rows, uint32_t cols) {
   printf("%u,%u,%llu\n", rows, cols, time);
 };
 
-template <typename P> void run() {
-  // run benchmark
-  printf("rows,cols,time_us\n");
-  constexpr uint16_t min = 5;
-  constexpr uint16_t max = 500;
-  constexpr uint16_t step = 2;
-  constexpr float max_ratio = 0.4;
+template <typename P>
+void loop(uint16_t min, uint16_t max, uint16_t step, float max_ratio) {
   for (uint16_t x = min; x <= max; x += (int)step) {
     for (uint16_t y = min; y <= x; y += (int)step) {
       if ((float)y < (float)x * max_ratio)
@@ -43,4 +38,14 @@ template <typename P> void run() {
         op<P>(y, x);
     }
   }
+}
+
+template <typename P> void run() {
+  // run benchmark
+  printf("rows,cols,time_us\n");
+  loop<P>(5, 25, 2, 0.2);
+  loop<P>(25, 50, 3, 0.3);
+  loop<P>(50, 100, 5, 0.4);
+  loop<P>(100, 200, 8, 0.5);
+  loop<P>(200, 500, 15, 0.5);
 }

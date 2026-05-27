@@ -1,6 +1,7 @@
 #pragma once
 
 #include "benchmarks/benchmarks.h"
+#include "my_rand.h"
 #include <cstdint>
 #include <cstdio>
 
@@ -29,19 +30,14 @@ template <typename P> inline void op(uint32_t x, uint32_t y, uint32_t z) {
   M2.setRandom();
 
   const auto time = matmul::matmul(M1, M2, R);
-  printf("%u,%u,%u,%llu\n", y, x, z, time);
+  printf("%u,%u,%u,%llu\n", x, y, z, time);
 };
 
-template <typename P> void run() {
-  // run benchmark
-  printf("x,y,z,time_us\n");
-  constexpr uint16_t min = 5;
-  constexpr uint16_t max = 400;
-  constexpr uint16_t step = 10;
-  constexpr float max_ratio = 0.5;
-  for (uint16_t x = min; x <= max; x += (uint16_t)step) {
-    for (uint16_t y = min; y <= x; y += (uint16_t)step) {
-      for (uint16_t z = min; z <= y; z += (uint16_t)step) {
+template <typename P>
+void loop(uint16_t min, uint16_t max, uint16_t step, float max_ratio) {
+  for (uint16_t x = min; x <= max; x += step) {
+    for (uint16_t y = min; y <= x; y += step) {
+      for (uint16_t z = min; z <= y; z += step) {
         if ((float)y < (float)x * max_ratio ||
             (float)z < (float)y * max_ratio || (float)z < (float)x * max_ratio)
           continue;
@@ -56,4 +52,15 @@ template <typename P> void run() {
       }
     }
   }
+}
+
+template <typename P> void run() {
+  // run benchmark
+  printf("x,y,z,time_us\n");
+
+  loop<P>(5, 25, 2, 0.2);
+  loop<P>(25, 50, 3, 0.3);
+  loop<P>(50, 100, 5, 0.4);
+  loop<P>(100, 200, 8, 0.5);
+  loop<P>(200, 500, 15, 0.5);
 }

@@ -9,9 +9,16 @@
 using namespace benchmarks;
 
 template <typename P, size_t SIZE> void debug() {
-  const Matrix<P, SIZE, SIZE> source(Matrix<P, SIZE, SIZE>::Random());
-  auto [time, res] = det::stack<P>(source);
+  Matrix<P, SIZE, SIZE> source;
+  source.setRandom();
 
-  print_all<'\n'>("SOURCE:", source.format(EIGEN_FMT), "DETERMINANT:", res,
-                  "TIME:", time);
+  auto [time, res] = det::determinant<P>(source);
+
+  printf("SOURCE:\n");
+  print_float_matrix(source);
+  printf("DETERMINANT: %.17g\n", res);
+  printf("TIME: %llu\n", time);
+
+  // print_all<'\n'>("SOURCE:", source.format(EIGEN_FMT), "DETERMINANT:", res,
+  //                 "TIME:", time);
 }

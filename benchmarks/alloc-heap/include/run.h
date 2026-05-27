@@ -8,17 +8,14 @@
 
 using namespace benchmarks;
 
-template <typename P> inline void op(uint32_t size) {
-  auto [mat, time] = alloc::heap<P>(size);
-  printf("%u,%llu\n", size, time);
-};
+template <typename P> void loop(uint16_t min, uint16_t max, uint16_t step) {
+  for (uint16_t size = min; size <= max; size += (int)step) {
+    auto [mat, time] = alloc::heap<P>(size);
+    printf("%u,%u,%llu\n", size, size, time);
+  }
+}
 
 template <typename P> void run() {
-  // run benchmark
-  printf("rows/cols,time_us\n");
-  const uint16_t min = 5;
-  const uint16_t max = 500;
-  const uint16_t step = 2;
-  for (uint16_t size = min; size <= max; size += (int)step)
-    op<P>(size);
+  printf("rows,cols,time_us\n");
+  loop<P>(5, 500, 2);
 }

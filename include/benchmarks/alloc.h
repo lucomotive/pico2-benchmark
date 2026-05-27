@@ -18,7 +18,7 @@ template <typename S> no_inline std::tuple<Mat<S>, Time> heap(uint16_t size) {
   return {std::move(res), time};
 }
 
-template <typename S, uint16_t SIZE>
+template <typename S, uint32_t SIZE>
 no_inline std::tuple<Matrix<S, SIZE, SIZE>, Time> stack() {
   Timer timer;
   Matrix<S, SIZE, SIZE> res;

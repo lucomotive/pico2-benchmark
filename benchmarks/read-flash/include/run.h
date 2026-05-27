@@ -1,7 +1,6 @@
 #pragma once
 
 #include "benchmarks/benchmarks.h"
-#include "repeat.h"
 #include <cstdint>
 #include <cstdio>
 
@@ -12,13 +11,15 @@ template <typename P> inline void op(uint16_t size) {
   printf("%u,%llu\n", size, time);
 };
 
+template <typename P> void loop(uint16_t min, uint16_t max, uint16_t step) {
+  for (uint16_t i = min; i < max; i += step)
+    op<P>(i);
+}
+
 template <typename P> void run() {
   // run benchmark
   printf("rows/cols,time_us\n");
-  const uint16_t min = 5;
-  const uint16_t max = 100;
-  const uint16_t step = 2;
-
-  for (uint16_t i = min; i < max; i += step)
-    op<P>(i);
+  loop<P>(5, 50, 2);
+  loop<P>(50, 100, 3);
+  loop<P>(100, 500, 5);
 }

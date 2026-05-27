@@ -22,6 +22,10 @@ template <typename P> void debug(uint32_t size) {
 
   auto [time, res] = det::determinant<P>(source);
 
-  print_all<'\n'>("SOURCE:", source.format(EIGEN_FMT), "DETERMINANT:", res,
-                  "TIME:", time);
+  printf("SOURCE:\n");
+  print_float_matrix(source);
+  printf("DETERMINANT: %.17g\n", res);
+  printf("TIME: %llu\n", time);
+  // print_all<'\n'>("SOURCE:", source.format(EIGEN_FMT), "DETERMINANT:", res,
+  //                 "TIME:", time);
 }

@@ -7,11 +7,17 @@
 using namespace benchmarks;
 
 template <typename P> void debug(uint16_t size) {
-  Mat<P> m1(Mat<P>::Random(size, size));
-  Mat<P> m2(Mat<P>::Random(size, size));
+  const Mat<P> m1(Mat<P>::Random(size, size));
+  const Mat<P> m2(Mat<P>::Random(size, size));
   Mat<P> RES;
-  auto time = matmul::matmul(m1, m2, RES);
+  const auto time = matmul::matmul(m1, m2, RES);
 
-  print_all<'\n'>("RESULT:", RES.format(EIGEN_FMT), "NORM:", RES.norm(),
-                  "TIME:", time);
+  printf("RESULT:\n");
+  print_float_matrix(RES);
+
+  printf("NORM: %.17g\n", RES.norm());
+  printf("TIME: %llu\n", time);
+
+  // print_all<'\n'>("RESULT:", RES.format(EIGEN_FMT), "NORM:", RES.norm(),
+  //                 "TIME:", time);
 }

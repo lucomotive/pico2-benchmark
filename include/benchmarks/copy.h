@@ -1,6 +1,5 @@
 #pragma once
 
-#include "const_rand.h"
 #include "timer.h"
 #include "utils.h"
 #include <Eigen/Dense>

@@ -26,7 +26,17 @@ template <typename P> void debug(uint32_t size) {
   const auto values = solver.eigenvalues();
   const auto vectors = solver.eigenvectors();
 
-  print_all<'\n'>("SOURCE:", source.format(EIGEN_FMT), "COMPUTABLE:", success,
-                  "VALUES:", values.format(EIGEN_FMT),
-                  "VECTORS:", vectors.format(EIGEN_FMT), "TIME:", time);
+  printf("SOURCE:\n");
+  print_float_matrix(source);
+  printf("COMPUTABLE: %d\n", success);
+  printf("VALUES:\n");
+  print_float_matrix(values);
+  printf("VECTORS:\n");
+  print_float_matrix(vectors);
+  printf("TIME: %llu\n", time);
+
+  // print_all<'\n'>("SOURCE:", source.format(EIGEN_FMT), "COMPUTABLE:",
+  // success,
+  //                 "VALUES:", values.format(EIGEN_FMT),
+  //                 "VECTORS:", vectors.format(EIGEN_FMT), "TIME:", time);
 }

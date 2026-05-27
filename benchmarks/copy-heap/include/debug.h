@@ -23,8 +23,13 @@ template <typename P> void debug(uint32_t size) {
   source.setRandom();
   res.setRandom();
 
-  auto time = copy::copy(res, source);
+  const auto time = copy::copy(res, source);
 
-  print_all<'\n'>("SOURCE:", source.format(EIGEN_FMT),
-                  "COPY:", res.format(EIGEN_FMT), "TIME:", time);
+  printf("SOURCE:\n");
+  print_float_matrix(source);
+  printf("COPY:\n");
+  print_float_matrix(res);
+  printf("TIME: %llu\n", time);
+  // print_all<'\n'>("SOURCE:", source.format(EIGEN_FMT),
+  //                 "COPY:", res.format(EIGEN_FMT), "TIME:", time);
 }

@@ -1,4 +1,4 @@
 
 #include "main.h"
 
-int main() { banch_main<double>(); }
+int main() { bench_main<double>(); }

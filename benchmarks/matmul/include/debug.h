@@ -29,6 +29,16 @@ template <typename P> void debug(uint32_t x, uint32_t y, uint32_t z) {
 
   const auto time = matmul::matmul(M1, M2, R);
 
-  print_all<'\n'>("M1:", M1.format(EIGEN_FMT), "M2:", M2.format(EIGEN_FMT),
-                  "RES:", R.format(EIGEN_FMT), "TIME:", time);
+  printf("M1:\n");
+  print_float_matrix(M1);
+
+  printf("M2:\n");
+  print_float_matrix(M2);
+
+  printf("RES:\n");
+  print_float_matrix(R);
+
+  printf("TIME: %llu\n", time);
+  // print_all<'\n'>("M1:", M1.format(EIGEN_FMT), "M2:", M2.format(EIGEN_FMT),
+  //                 "RES:", R.format(EIGEN_FMT), "TIME:", time);
 }

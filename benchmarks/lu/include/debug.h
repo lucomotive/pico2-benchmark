@@ -21,6 +21,12 @@ template <typename P> void debug(uint32_t rows, uint32_t cols) {
   FullPivLU<Mat<P>> lu(rows, cols);
   const auto time = lu::full_piv(lu, source);
 
+  printf("SOURCE:\n");
+  print_float_matrix(source);
+  printf("LU:\n");
+  print_float_matrix(lu.matrixLU());
+  printf("TIME: %llu\n", time);
+
   print_all<'\n'>("SOURCE:", source.format(EIGEN_FMT),
                   "LU:", lu.matrixLU().format(EIGEN_FMT), "TIME:", time);
 }

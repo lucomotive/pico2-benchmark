@@ -17,17 +17,25 @@ template <typename P> void debug(uint32_t size) {
   Map<Mat<P>> source((P *)s_cache, size, size);
   Map<Mat<P>> temp((P *)t_cache, size, size);
 #else
-  Mat<P> source(rows, cols);
+  Mat<P> source(size, size);
   Mat<P> temp;
 #endif
   source.setRandom();
 
-  temp = source * source.adjoint();
+  temp.noalias() = source * source.adjoint();
 
   LLT<Mat<P>> llt(size);
   auto time = llt::llt(llt, temp);
 
-  print_all<'\n'>("SOURCE:", source.format(EIGEN_FMT),
-                  "TEMP:", temp.format(EIGEN_FMT),
-                  "LLT:", llt.matrixLLT().format(EIGEN_FMT), "TIME:", time);
+  printf("SOURCE:\n");
+  print_float_matrix(source);
+  printf("TEMP:\n");
+  print_float_matrix(temp);
+  printf("LLT:\n");
+  print_float_matrix(llt.matrixLLT());
+  printf("TIME: %llu\n", time);
+
+  // print_all<'\n'>("SOURCE:", source.format(EIGEN_FMT),
+  //                 "TEMP:", temp.format(EIGEN_FMT),
+  //                 "LLT:", llt.matrixLLT().format(EIGEN_FMT), "TIME:", time);
 }

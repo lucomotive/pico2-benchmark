@@ -24,6 +24,12 @@ template <typename P> void debug(uint32_t size) {
 
   auto time = inverse::inverse(res, source);
 
-  print_all<'\n'>("SOURCE:", source.format(EIGEN_FMT),
-                  "INVERSE:", res.format(EIGEN_FMT), "TIME:", time);
+  printf("SOURCE:\n");
+  print_float_matrix(source);
+  printf("INVERSE:\n");
+  print_float_matrix(res);
+  printf("TIME: %llu\n", time);
+
+  // print_all<'\n'>("SOURCE:", source.format(EIGEN_FMT),
+  //                 "INVERSE:", res.format(EIGEN_FMT), "TIME:", time);
 }

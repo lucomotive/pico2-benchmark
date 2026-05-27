@@ -8,10 +8,17 @@
 using namespace benchmarks;
 
 template <typename P, uint32_t SIZE> void debug() {
-  const Matrix<P, SIZE, SIZE> source(Matrix<P, SIZE, SIZE>::Random(SIZE, SIZE));
+  Matrix<P, SIZE, SIZE> source;
+  source.setRandom();
   Matrix<P, SIZE, SIZE> res;
-  auto time = copy::stack<P, SIZE>(res, source);
+  auto time = copy::copy(res, source);
 
-  print_all<'\n'>("SOURCE:", source.format(EIGEN_FMT),
-                  "COPY:", res.format(EIGEN_FMT), "TIME:", time);
+  printf("SOURCE:\n");
+  print_float_matrix(source);
+  printf("COPY:\n");
+  print_float_matrix(res);
+  printf("TIME: %llu\n", time);
+
+  // print_all<'\n'>("SOURCE:", source.format(EIGEN_FMT),
+  //                 "COPY:", res.format(EIGEN_FMT), "TIME:", time);
 }
